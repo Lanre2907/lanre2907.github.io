@@ -6,7 +6,8 @@
 <title>Luke Agbetu — Lead Data Engineer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -18,11 +19,11 @@
     --bg: #ffffff;
     --bg2: #f7f7f7;
     --mono: 'DM Mono', monospace;
-    --display: 'Syne', sans-serif;
-    --serif: 'Lora', serif;
+    --display: 'Cabinet Grotesk', sans-serif;
+    --serif: 'Cabinet Grotesk', sans-serif;
   }
   html { scroll-behavior: smooth; }
-  body { background: var(--bg); color: var(--ink); font-family: var(--serif); font-size: 17px; line-height: 1.75; overflow-x: hidden; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Cabinet Grotesk', sans-serif; font-size: 17px; line-height: 1.75; overflow-x: hidden; }
 
   /* NAV */
   nav {
@@ -188,6 +189,7 @@
     <li><a href="#projects">Projects</a></li>
     <li><a href="#education">Education</a></li>
     <li><a href="#contact">Contact</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
     <li><a class="nav-resume" href="https://raw.githubusercontent.com/Lanre2907/Lanre2907.github.io/main/luke_agbetu_resume.pdf" target="_blank">↓ Resume</a></li>
   </ul>
 </nav>
@@ -275,6 +277,20 @@
         <span class="pill">SCD</span><span class="pill">Transactional Modeling</span><span class="pill">Data Lakehouse</span>
       </div>
     </div>
+    <div class="skill-block">
+      <div class="skill-block-title">Security &amp; Automation</div>
+      <div class="skill-pills">
+        <span class="pill accent">Microsoft Sentinel (SIEM)</span>
+        <span class="pill accent">Azure Logic Apps</span>
+        <span class="pill accent">Tines (SOAR)</span>
+        <span class="pill">Security Automation</span>
+        <span class="pill">Incident Response</span>
+        <span class="pill">Rapid7 InsightVM</span>
+        <span class="pill">Vulnerability Management</span>
+        <span class="pill">Compliance &amp; PII Protection</span>
+        <span class="pill">SolarWinds</span>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -297,14 +313,16 @@
     </div>
     <div class="job">
       <div class="job-header"><span class="job-title">Data Engineer / Cloud &amp; Analytics Support</span><span class="job-company">Exact Trust · Dallas, TX</span></div>
-      <div class="job-meta">October 2023 – December 2024 · Analytics</div>
+      <div class="job-meta">October 2023 – December 2024 · Analytics &amp; Security</div>
       <ul>
         <li>Engineered cloud-based data pipelines across AWS and Azure supporting 6+ internal business units and processing 2TB+ of structured and semi-structured data monthly.</li>
         <li>Built Databricks and Spark-based Medallion pipelines using Delta Lake, reducing data processing time by ~35%.</li>
-        <li>Integrated Rapid7 vulnerability data into analytics dashboards, improving incident detection response time by ~20%.</li>
+        <li>Designed and deployed security automation workflows using Microsoft Sentinel (SIEM) and Azure Logic Apps, automating threat detection, alert triage, and incident response to reduce manual analyst workload.</li>
+        <li>Built end-to-end security orchestration playbooks using Tines (SOAR), automating multi-step response actions across Sentinel, email, and ticketing systems — cutting mean time to respond to incidents.</li>
+        <li>Integrated Rapid7 vulnerability data into analytics dashboards and compliance workflows, improving incident detection response time by ~20%.</li>
         <li>Automated ingestion, transformation, and reporting workflows eliminating ~15 hours/week of manual effort.</li>
       </ul>
-      <div class="job-tools">Python · PowerShell · Apache Spark · Databricks · Delta Lake · AWS · Azure Data Factory · Rapid7 InsightVM · SolarWinds · Power BI</div>
+      <div class="job-tools">Python · PowerShell · Apache Spark · Databricks · Delta Lake · AWS · Azure Data Factory · Microsoft Sentinel · Azure Logic Apps · Tines · Rapid7 InsightVM · SolarWinds · Power BI</div>
     </div>
     <div class="job">
       <div class="job-header"><span class="job-title">Data Engineer / SQL Database Developer</span><span class="job-company">DbConn · Hamburg, Germany</span></div>
