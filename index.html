@@ -1,804 +1,283 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Luke Agbetu — Data Engineering Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Luke Agbetu — Data Engineer</title>
+<meta name="description" content="Luke Agbetu, Data Engineer in Dallas–Fort Worth. Spark, Databricks, Airflow, AWS, Azure and GCP. 9+ years building data platforms and banking systems.">
+<meta property="og:title" content="Luke Agbetu — Data Engineer">
+<meta property="og:description" content="I move 10 million records before you finish your coffee.">
+<meta property="og:image" content="https://lukeagbetu.com/profile.jpg">
+<meta property="og:url" content="https://lukeagbetu.com/">
+<meta name="theme-color" content="#0D1117">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230D1117'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' dominant-baseline='middle' font-family='monospace' font-weight='700' font-size='28' fill='%237EE787'%3ELA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#ffffff;
-  --bg2:#f8fafc;
-  --bg3:#f1f5f9;
-  --surface:#ffffff;
-  --surface2:#f1f5f9;
-  --border:#e2e8f0;
-  --border2:#cbd5e1;
-  --text:#0f1117;
-  --muted:#64748b;
-  --dim:#94a3b8;
-  --green:#22c55e;
-  --green-dim:#f0fdf4;
-  --green-border:#166534;
-  --blue:#3b82f6;
-  --blue-dim:#eff6ff;
-  --blue-border:#1e40af;
-  --purple:#a855f7;
-  --purple-dim:#faf5ff;
-  --purple-border:#7e22ce;
-  --amber:#f59e0b;
-  --amber-dim:#fffbeb;
-  --amber-border:#b45309;
-  --red:#ef4444;
-  --cyan:#06b6d4;
-  --mono:'JetBrains Mono',monospace;
-  --sans:'Inter',sans-serif;
+  --bg:#0D1117; --panel:#161B22; --line:#30363D; --line-soft:#21262D;
+  --text:#E6EDF3; --muted:#9DA7B3; --accent:#7EE787; --accent-hover:#B4F5BC;
+  --amber:#F2CC60; --blue:#79C0FF;
+  --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;overflow-x:hidden;min-height:100vh}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--mono);line-height:1.5;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+a:hover{color:var(--accent-hover)}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+img{max-width:100%;display:block}
 
-/* ── TOPBAR ── */
-.topbar{
-  background:var(--bg2);
-  border-bottom:1px solid var(--border);
-  padding:0 1.5rem;
-  height:52px;
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:100;
+/* nav */
+.nav{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;padding:24px 0;border-bottom:1px solid var(--line);font-size:14px}
+.prompt{color:var(--muted)}
+.prompt span{color:var(--accent)}
+.nav-links{display:flex;flex-wrap:wrap;gap:24px}
+.nav-links a{text-decoration:none}
+
+/* hero */
+.hero{padding:88px 0 64px;display:flex;flex-wrap:wrap;align-items:center;gap:48px}
+.hero-text{flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:20px}
+.cmd{margin:0;color:var(--muted);font-size:15px}
+h1{margin:0;font-size:clamp(44px,7vw,96px);line-height:1;font-weight:800;letter-spacing:-0.03em}
+.cursor{color:var(--accent);animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.role{margin:0;font-size:20px}
+.comment{margin:0;max-width:720px;font-size:16px;line-height:1.7;color:var(--muted)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.btn{display:inline-flex;align-items:center;min-height:48px;padding:0 22px;border-radius:6px;text-decoration:none;font-weight:700}
+.btn-primary{background:var(--accent);color:var(--bg)}
+.btn-primary:hover{background:var(--accent-hover);color:var(--bg)}
+.btn-ghost{border:1px solid var(--line);color:var(--text)}
+.btn-ghost:hover{border-color:var(--muted);color:var(--text)}
+.avatar{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:14px;margin:0 auto}
+.avatar-ring{width:280px;height:280px;border-radius:50%;border:3px solid var(--accent);box-shadow:0 0 0 10px var(--bg),0 0 0 11px var(--line);overflow:hidden;background:var(--panel)}
+.avatar-ring img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.status{font-size:13px;color:var(--muted)}
+.status b{color:var(--accent);font-weight:400}
+
+/* stats */
+.stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;padding-bottom:72px}
+.stage{border:1px solid var(--line);border-radius:8px;padding:22px;background:var(--panel);display:flex;flex-direction:column;gap:10px}
+.stage-label{font-size:12px;color:var(--muted);letter-spacing:0.08em}
+.stage-value{font-size:44px;font-weight:800;color:var(--accent);line-height:1}
+.stage-desc{font-size:14px}
+
+/* sections */
+section{padding-bottom:72px}
+h2{margin:0 0 20px;font-size:15px;font-weight:500;color:var(--muted)}
+
+/* jobs table */
+.table{border:1px solid var(--line);border-radius:8px;overflow-x:auto}
+.table-inner{min-width:760px}
+.row{display:grid;grid-template-columns:110px minmax(0,2.4fr) minmax(0,1fr) minmax(0,1.6fr);gap:16px;padding:18px 20px;border-bottom:1px solid var(--line-soft);font-size:15px;align-items:baseline}
+.row:last-child{border-bottom:0}
+.row.head{padding:14px 20px;background:var(--panel);border-bottom:1px solid var(--line);font-size:12px;color:var(--muted);letter-spacing:0.06em}
+.ok{color:var(--accent)}
+.live{color:var(--amber)}
+.title{font-weight:700}
+.org{color:var(--muted)}
+.stack{color:var(--amber);font-size:13px}
+
+details.more{margin-top:16px}
+details.more summary{cursor:pointer;font-size:14px;color:var(--accent);list-style:none;min-height:44px;display:inline-flex;align-items:center}
+details.more summary::-webkit-details-marker{display:none}
+details.more[open] summary .closed{display:none}
+details.more:not([open]) summary .opened{display:none}
+.all-jobs{margin-top:8px;border:1px solid var(--line);border-radius:8px;padding:8px 20px 16px}
+.group{padding-top:14px}
+.group h3{margin:0 0 6px;font-size:14px;color:var(--blue);font-weight:500}
+.group ul{margin:0;padding-left:18px;font-size:14px;line-height:1.8}
+.group li span{color:var(--muted)}
+.group a{font-size:13px}
+
+/* git log */
+.log-row{display:flex;flex-wrap:wrap;gap:8px 20px;padding:14px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.log-date{color:var(--amber);width:130px;flex-shrink:0}
+.log-body{flex:999 1 420px;min-width:0}
+.log-body b{font-weight:700}
+.log-body span{color:var(--muted)}
+
+/* stack.yml */
+.yml-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.yml{border:1px solid var(--line);border-radius:8px;padding:20px;background:var(--panel);font-size:14px;line-height:1.8}
+.yml.plain{background:transparent}
+.key{color:var(--blue)}
+.yml ul{list-style:none;margin:0;padding-left:16px}
+.yml li::before{content:"- ";color:var(--muted)}
+.yml-grid + .yml-grid{margin-top:16px}
+.yml-grid.wide{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+
+/* footer */
+footer{padding:56px 0 64px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:20px}
+footer .big{margin:0;font-size:clamp(32px,5vw,64px);font-weight:800;letter-spacing:-0.02em;color:var(--text);line-height:1.1}
+.links{display:flex;flex-wrap:wrap;gap:28px;font-size:16px}
+.fine{margin:24px 0 0;font-size:12px;color:var(--muted)}
+
+@media (max-width:640px){
+  .wrap{padding:0 20px}
+  .hero{padding:56px 0 48px;gap:36px}
+  .avatar{order:-1}
+  .avatar-ring{width:200px;height:200px}
 }
-.topbar-left{display:flex;align-items:center;gap:1rem}
-.topbar-logo{display:flex;align-items:center;gap:0.6rem}
-.logo-mark{width:28px;height:28px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.65rem;font-weight:700;color:#fff;letter-spacing:0.05em}
-.logo-text{font-family:var(--mono);font-size:0.78rem;font-weight:700;color:var(--text);letter-spacing:0.02em}
-.logo-text span{color:var(--muted);font-weight:400}
-.topbar-divider{width:1px;height:20px;background:var(--border)}
-.topbar-breadcrumb{font-family:var(--mono);font-size:0.68rem;color:var(--muted)}
-.topbar-breadcrumb span{color:var(--text)}
-.topbar-right{display:flex;align-items:center;gap:1rem}
-.status-badge{display:flex;align-items:center;gap:0.4rem;font-family:var(--mono);font-size:0.65rem;color:var(--green);background:var(--green-dim);border:1px solid var(--green-border);padding:0.25rem 0.7rem}
-.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse-dot 2s ease-in-out infinite}
-@keyframes pulse-dot{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)}50%{box-shadow:0 0 0 4px rgba(34,197,94,0)}}
-.topbar-nav{display:flex;gap:0.25rem}
-.topbar-nav a{font-family:var(--mono);font-size:0.65rem;color:var(--muted);text-decoration:none;padding:0.35rem 0.75rem;border-radius:3px;transition:all 0.2s;letter-spacing:0.03em}
-.topbar-nav a:hover{background:var(--surface);color:var(--text)}
-.topbar-nav a.active{background:var(--surface);color:var(--text)}
-.btn-resume{font-family:var(--mono);font-size:0.65rem;padding:0.35rem 0.85rem;background:var(--blue);color:#fff;text-decoration:none;border:1px solid var(--blue-border);transition:all 0.2s;letter-spacing:0.03em}
-.btn-resume:hover{background:#2563eb}
-
-/* ── SIDEBAR ── */
-.layout{display:grid;grid-template-columns:200px 1fr;min-height:calc(100vh - 52px)}
-.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:1.25rem 0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto}
-.sidebar-section{margin-bottom:1.5rem}
-.sidebar-label{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);padding:0 1rem;margin-bottom:0.4rem}
-.sidebar-item{display:flex;align-items:center;gap:0.6rem;padding:0.5rem 1rem;font-family:var(--mono);font-size:0.7rem;color:var(--muted);text-decoration:none;transition:all 0.15s;cursor:pointer;border-left:2px solid transparent}
-.sidebar-item:hover{background:var(--surface);color:var(--text);border-left-color:var(--border2)}
-.sidebar-item.active{background:var(--surface);color:var(--blue);border-left-color:var(--blue)}
-.sidebar-icon{width:14px;height:14px;opacity:0.6;flex-shrink:0}
-.sidebar-badge{margin-left:auto;font-size:0.58rem;background:var(--surface2);padding:1px 5px;color:var(--muted);border-radius:8px}
-.sidebar-item.active .sidebar-badge{background:var(--blue-dim);color:var(--blue)}
-.sidebar-divider{height:1px;background:var(--border);margin:0.75rem 1rem}
-.sidebar-avatar{display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;border-top:1px solid var(--border);margin-top:auto}
-.avatar-img{width:28px;height:28px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1px solid var(--border2)}
-.avatar-img img{width:100%;height:100%;object-fit:cover}
-.avatar-info{}
-.avatar-name{font-family:var(--mono);font-size:0.68rem;font-weight:600;color:var(--text);line-height:1.2}
-.avatar-role{font-family:var(--mono);font-size:0.58rem;color:var(--muted)}
-
-/* ── MAIN CONTENT ── */
-.main{padding:1.5rem;overflow-y:auto}
-
-/* ── PAGE HEADER ── */
-.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem}
-.page-title{font-size:1.4rem;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:0.15rem}
-.page-subtitle{font-family:var(--mono);font-size:0.7rem;color:var(--muted)}
-.page-actions{display:flex;gap:0.5rem}
-.btn-sm{font-family:var(--mono);font-size:0.65rem;padding:0.4rem 0.85rem;text-decoration:none;border:1px solid var(--border2);color:var(--muted);transition:all 0.2s;cursor:pointer;background:transparent}
-.btn-sm:hover{border-color:var(--blue);color:var(--blue)}
-.btn-sm.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
-.btn-sm.primary:hover{background:#2563eb}
-
-/* ── KPI CARDS ── */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
-.kpi-card{background:var(--bg2);border:1px solid var(--border);padding:1.1rem;position:relative;overflow:hidden;transition:border-color 0.2s}
-.kpi-card:hover{border-color:var(--border2)}
-.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-.kpi-card.g::before{background:var(--green)}
-.kpi-card.b::before{background:var(--blue)}
-.kpi-card.p::before{background:var(--purple)}
-.kpi-card.a::before{background:var(--amber)}
-.kpi-label{font-family:var(--mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.6rem;display:flex;align-items:center;justify-content:space-between}
-.kpi-icon{font-size:10px}
-.kpi-value{font-size:1.8rem;font-weight:700;letter-spacing:-0.03em;line-height:1;margin-bottom:0.3rem}
-.kpi-card.g .kpi-value{color:var(--green)}
-.kpi-card.b .kpi-value{color:var(--blue)}
-.kpi-card.p .kpi-value{color:var(--purple)}
-.kpi-card.a .kpi-value{color:var(--amber)}
-.kpi-delta{font-family:var(--mono);font-size:0.62rem;color:var(--muted)}
-.kpi-delta .pos{color:var(--green)}
-.kpi-delta .neg{color:var(--red)}
-
-/* ── PANEL GRID ── */
-.panel-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:1rem;margin-bottom:1rem}
-.panel-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem}
-
-/* ── PANEL ── */
-.panel{background:var(--bg2);border:1px solid var(--border)}
-.panel-header{padding:0.85rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.panel-title{font-family:var(--mono);font-size:0.68rem;font-weight:600;color:var(--text);letter-spacing:0.02em}
-.panel-tag{font-family:var(--mono);font-size:0.58rem;color:var(--muted);background:var(--surface);padding:1px 6px;border:1px solid var(--border2)}
-.panel-body{padding:1rem}
-
-/* ── PROFILE PANEL ── */
-.profile-row{display:flex;align-items:center;gap:1rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
-.profile-photo{width:56px;height:56px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--border2)}
-.profile-photo img{width:100%;height:100%;object-fit:cover}
-.profile-name{font-size:1rem;font-weight:700;color:var(--text);letter-spacing:-0.01em;margin-bottom:0.1rem}
-.profile-role{font-family:var(--mono);font-size:0.65rem;color:var(--blue)}
-.profile-loc{font-family:var(--mono);font-size:0.6rem;color:var(--muted)}
-.profile-fields{}
-.pf-row{display:flex;gap:0.5rem;margin-bottom:0.5rem;align-items:baseline}
-.pf-label{font-family:var(--mono);font-size:0.58rem;color:var(--muted);min-width:68px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.06em}
-.pf-value{font-family:var(--mono);font-size:0.65rem;color:var(--text)}
-.pf-link{font-family:var(--mono);font-size:0.65rem;color:var(--blue);text-decoration:none}
-.pf-link:hover{text-decoration:underline}
-
-/* ── SKILL BARS ── */
-.skill-bar-row{margin-bottom:0.75rem}
-.skill-bar-header{display:flex;justify-content:space-between;margin-bottom:0.3rem}
-.skill-bar-name{font-family:var(--mono);font-size:0.65rem;color:var(--text)}
-.skill-bar-pct{font-family:var(--mono);font-size:0.62rem;color:var(--muted)}
-.skill-track{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
-.skill-fill{height:100%;border-radius:2px;transition:width 1s ease}
-.skill-fill.b{background:var(--blue)}
-.skill-fill.g{background:var(--green)}
-.skill-fill.p{background:var(--purple)}
-.skill-fill.a{background:var(--amber)}
-.skill-fill.c{background:var(--cyan)}
-
-/* ── TIMELINE TABLE ── */
-.timeline-table{width:100%}
-.timeline-table tr{border-bottom:1px solid var(--border)}
-.timeline-table tr:last-child{border-bottom:none}
-.timeline-table td{padding:0.65rem 0;vertical-align:top}
-.tt-dot{width:24px}
-.tt-indicator{width:8px;height:8px;border-radius:50%;margin-top:4px}
-.tt-indicator.active{background:var(--blue);box-shadow:0 0 8px rgba(59,130,246,0.5)}
-.tt-indicator.done{background:var(--green)}
-.tt-indicator.old{background:var(--dim)}
-.tt-title{font-family:var(--mono);font-size:0.7rem;font-weight:600;color:var(--text);margin-bottom:0.1rem}
-.tt-company{font-family:var(--mono);font-size:0.6rem;color:var(--muted)}
-.tt-date{font-family:var(--mono);font-size:0.6rem;color:var(--muted);text-align:right;white-space:nowrap;padding-left:0.5rem}
-.tt-badge{font-family:var(--mono);font-size:0.55rem;padding:1px 6px;margin-top:2px;display:inline-block}
-.tt-badge.live{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green)}
-.tt-badge.done{background:var(--blue-dim);border:1px solid var(--blue-border);color:var(--blue)}
-.tt-badge.prev{background:var(--surface2);border:1px solid var(--border2);color:var(--muted)}
-
-/* ── STACK PILLS ── */
-.stack-section{margin-bottom:0.85rem}
-.stack-label{font-family:var(--mono);font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.4rem}
-.stack-pills{display:flex;flex-wrap:wrap;gap:0.3rem}
-.spill{font-family:var(--mono);font-size:0.6rem;padding:0.2rem 0.5rem;border:1px solid var(--border);color:var(--muted);background:var(--bg)}
-.spill.hi{border-color:var(--blue-border);color:var(--blue);background:var(--blue-dim)}
-.spill.g{border-color:var(--green-border);color:var(--green);background:var(--green-dim)}
-.spill.p{border-color:var(--purple-border);color:var(--purple);background:var(--purple-dim)}
-
-/* ── PROJECT TABLE ── */
-.proj-table{width:100%;border-collapse:collapse}
-.proj-table th{font-family:var(--mono);font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);padding:0 0 0.5rem;text-align:left;border-bottom:1px solid var(--border)}
-.proj-table td{padding:0.6rem 0;border-bottom:1px solid var(--border);vertical-align:middle}
-.proj-table tr:last-child td{border-bottom:none}
-.proj-name{font-family:var(--mono);font-size:0.68rem;font-weight:600;color:var(--text)}
-.proj-employer{font-family:var(--mono);font-size:0.6rem;color:var(--muted)}
-.proj-status{font-family:var(--mono);font-size:0.58rem;padding:1px 6px;display:inline-block}
-.proj-status.live{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green)}
-.proj-status.shipped{background:var(--blue-dim);border:1px solid var(--blue-border);color:var(--blue)}
-.proj-tech{display:flex;flex-wrap:wrap;gap:0.25rem}
-.proj-tag{font-family:var(--mono);font-size:0.55rem;padding:1px 5px;background:var(--surface);border:1px solid var(--border);color:var(--muted)}
-.proj-link{font-family:var(--mono);font-size:0.6rem;color:var(--blue);text-decoration:none}
-.proj-link:hover{text-decoration:underline}
-
-/* ── CERT PANEL ── */
-.cert-row{display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid var(--border)}
-.cert-row:last-child{border-bottom:none}
-.cert-icon{width:30px;height:30px;background:var(--amber-dim);border:1px solid var(--amber-border);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.5rem;color:var(--amber);text-align:center;line-height:1.2;flex-shrink:0}
-.cert-name{font-family:var(--mono);font-size:0.65rem;color:var(--text);font-weight:500}
-.cert-issuer{font-family:var(--mono);font-size:0.58rem;color:var(--muted)}
-.cert-check{margin-left:auto;color:var(--green);font-size:0.75rem}
-
-/* ── STATS MINI CHART ── */
-.mini-bars{display:flex;align-items:flex-end;gap:3px;height:40px;margin-top:0.5rem}
-.mini-bar{flex:1;border-radius:1px 1px 0 0;min-height:4px;transition:height 0.5s}
-
-/* ── CONTACT PANEL ── */
-.contact-row{display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid var(--border)}
-.contact-row:last-child{border-bottom:none}
-.contact-icon{width:28px;height:28px;background:var(--surface);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:0.75rem;flex-shrink:0}
-.contact-label{font-family:var(--mono);font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em}
-.contact-val{font-family:var(--mono);font-size:0.65rem;color:var(--text)}
-.contact-val a{color:var(--blue);text-decoration:none}
-.contact-val a:hover{text-decoration:underline}
-
-/* ── EDU PANEL ── */
-.edu-row{padding:0.65rem 0;border-bottom:1px solid var(--border)}
-.edu-row:last-child{border-bottom:none}
-.edu-deg{font-family:var(--mono);font-size:0.68rem;font-weight:600;color:var(--text);margin-bottom:0.1rem}
-.edu-inst{font-family:var(--mono);font-size:0.6rem;color:var(--muted)}
-.edu-year{font-family:var(--mono);font-size:0.58rem;color:var(--blue)}
-
-/* ── PUB PANEL ── */
-.pub-card-inner{background:var(--surface);border:1px solid var(--border2);border-left:2px solid var(--purple);padding:0.85rem}
-.pub-type{font-family:var(--mono);font-size:0.58rem;color:var(--purple);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem}
-.pub-title-text{font-family:var(--mono);font-size:0.7rem;color:var(--text);line-height:1.5;margin-bottom:0.5rem}
-
-/* ── FOOTER ── */
-.dash-footer{border-top:1px solid var(--border);padding:0.75rem 1.5rem;display:flex;justify-content:space-between;align-items:center;background:var(--bg2);font-family:var(--mono);font-size:0.6rem;color:var(--muted)}
-
-/* ── RESPONSIVE ── */
-@media(max-width:1000px){
-  .layout{grid-template-columns:1fr}
-  .sidebar{display:none}
-  .kpi-grid{grid-template-columns:1fr 1fr}
-  .panel-grid{grid-template-columns:1fr}
-  .panel-grid-3{grid-template-columns:1fr}
-}
-@media(max-width:600px){
-  .kpi-grid{grid-template-columns:1fr 1fr}
-  .topbar-nav{display:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .cursor{animation:none}
 }
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="topbar-left">
-    <div class="topbar-logo">
-      <div class="logo-mark">LA</div>
-      <div class="logo-text">luke_agbetu <span>/ portfolio</span></div>
-    </div>
-    <div class="topbar-divider"></div>
-    <div class="topbar-breadcrumb">workspace / <span>overview</span></div>
+<nav class="nav" aria-label="Main">
+  <span class="prompt">luke@agbetu:<span>~/portfolio</span>$</span>
+  <div class="nav-links">
+    <a href="#jobs">./jobs</a>
+    <a href="#log">git log</a>
+    <a href="#stack">stack.yml</a>
+    <a href="#contact">contact</a>
   </div>
-  <div class="topbar-right">
-    <div class="status-badge"><div class="status-dot"></div>Open to Work</div>
-    <nav class="topbar-nav">
-      <a href="#overview" class="active">Overview</a>
-      <a href="#projects">Projects</a>
-      <a href="#skills">Skills</a>
-    </nav>
-    <a class="btn-resume" href="https://lukeagbetu.com/luke_agbetu_resume.pdf" target="_blank">↓ Resume</a>
-  </div>
-</div>
+</nav>
 
-<!-- LAYOUT -->
-
-<!-- HERO SECTION -->
-<div style="background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 55%,#4f46e5 100%);padding:5rem 3rem 3.5rem;position:relative;overflow:hidden;margin-top:52px">
-  <!-- decorative circles -->
-  <div style="position:absolute;right:-60px;top:-60px;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);pointer-events:none"></div>
-  <div style="position:absolute;right:120px;bottom:-80px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.06);pointer-events:none"></div>
-  <div style="position:absolute;left:-40px;bottom:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.02);pointer-events:none"></div>
-
-  <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:3rem;align-items:center;position:relative;z-index:1">
-    <div>
-      <!-- eyebrow -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-        <div style="width:28px;height:1px;background:#60a5fa"></div>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#60a5fa;letter-spacing:0.15em;text-transform:uppercase">Lead Data Engineer · Aubrey, TX · Open to Work</span>
-      </div>
-
-      <!-- name -->
-      <h1 style="font-family:'Inter',sans-serif;font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;color:#fff;letter-spacing:-0.04em;line-height:0.95;margin-bottom:16px">Luke<br>Agbetu</h1>
-
-      <!-- quote -->
-      <p style="font-size:1.05rem;color:rgba(255,255,255,0.6);font-style:italic;line-height:1.6;max-width:480px;margin-bottom:24px">"I move 10 million records before you finish your coffee."</p>
-
-      <!-- pills -->
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:28px">
-        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.9);color:#1d4ed8;font-weight:600">AWS Certified</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);border:0.5px solid rgba(255,255,255,0.2)">Apache Spark</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);border:0.5px solid rgba(255,255,255,0.2)">Databricks</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);border:0.5px solid rgba(255,255,255,0.2)">AWS · Azure · GCP</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);border:0.5px solid rgba(255,255,255,0.2)">Security+</span>
-      </div>
-
-      <!-- CTA buttons -->
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <a href="#experience" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.06em;padding:12px 24px;background:#fff;color:#1d4ed8;text-decoration:none;border-radius:4px;font-weight:600;transition:all 0.2s">View Experience →</a>
-        <a href="#contact" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.06em;padding:12px 24px;background:transparent;color:rgba(255,255,255,0.8);text-decoration:none;border-radius:4px;border:0.5px solid rgba(255,255,255,0.3)">Get in Touch</a>
-        <a href="https://lukeagbetu.com/luke_agbetu_resume.pdf" target="_blank" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.06em;padding:12px 24px;background:transparent;color:rgba(255,255,255,0.8);text-decoration:none;border-radius:4px;border:0.5px solid rgba(255,255,255,0.3)">↓ Resume</a>
-      </div>
+<header class="hero">
+  <div class="hero-text">
+    <p class="cmd">$ whoami</p>
+    <h1>Luke Agbetu<span class="cursor" aria-hidden="true">_</span></h1>
+    <p class="role">Data Engineer · Spark · Databricks · Airflow · AWS / Azure / GCP</p>
+    <p class="comment"># I move 10 million records before you finish your coffee. 9+ years building data platforms and banking systems across Nigeria, Sierra Leone, Germany and the US.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="luke_agbetu_resume.pdf">curl resume.pdf</a>
+      <a class="btn btn-ghost" href="https://github.com/Lanre2907">github/Lanre2907</a>
     </div>
+  </div>
+  <div class="avatar">
+    <div class="avatar-ring"><img src="profile.jpg" alt="Portrait of Luke Agbetu" width="280" height="280"></div>
+    <span class="status"><b>●</b> status: open to work</span>
+  </div>
+</header>
 
-    <!-- right side: photo + stats -->
-    <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
-      <!-- photo -->
-      <div style="position:relative">
-        <div style="width:140px;height:140px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,0.25);box-shadow:0 0 40px rgba(59,130,246,0.3)">
-          <img src="data:image/png;base64,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" style="width:100%;height:100%;object-fit:cover" alt="Luke Agbetu">
-        </div>
-        <div style="position:absolute;bottom:4px;right:4px;width:16px;height:16px;border-radius:50%;background:#22c55e;border:2px solid #1d4ed8;animation:pulse-dot 2s ease-in-out infinite"></div>
-      </div>
+<section class="stages" aria-label="Highlights">
+  <div class="stage"><span class="stage-label">STAGE 1 · INGEST</span><span class="stage-value">10M+</span><span class="stage-desc">records / day, AT&amp;T telecom platform</span></div>
+  <div class="stage"><span class="stage-label">STAGE 2 · OPTIMIZE</span><span class="stage-value">60%</span><span class="stage-desc">query performance gain, DbConn</span></div>
+  <div class="stage"><span class="stage-label">STAGE 3 · DEPLOY</span><span class="stage-value">3</span><span class="stage-desc">clouds: AWS · Azure · GCP</span></div>
+  <div class="stage"><span class="stage-label">STAGE 4 · RUNTIME</span><span class="stage-value">9+</span><span class="stage-desc">years in production</span></div>
+</section>
 
-      <!-- stat pills -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div style="background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.15);padding:10px 14px;border-radius:8px;text-align:center">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#fff;line-height:1">9+</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.06em">Years</div>
-        </div>
-        <div style="background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.15);padding:10px 14px;border-radius:8px;text-align:center">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#60a5fa;line-height:1">10M+</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.06em">Records</div>
-        </div>
-        <div style="background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.15);padding:10px 14px;border-radius:8px;text-align:center">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#a78bfa;line-height:1">3</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.06em">Clouds</div>
-        </div>
-        <div style="background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.15);padding:10px 14px;border-radius:8px;text-align:center">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#34d399;line-height:1">60%</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.06em">Perf gain</div>
-        </div>
-      </div>
+<section id="jobs">
+  <h2>$ ./jobs --status=shipped --top=6</h2>
+  <div class="table">
+    <div class="table-inner">
+      <div class="row head"><span>STATUS</span><span>JOB</span><span>ORG</span><span>STACK</span></div>
+      <div class="row"><span class="ok">● SHIPPED</span><span class="title">Telecom Customer Data ETL Modernization</span><span class="org">AT&amp;T</span><span class="stack">PySpark · Airflow · Spark</span></div>
+      <div class="row"><span class="ok">● SHIPPED</span><span class="title">Delta Lake Performance Optimization</span><span class="org">AT&amp;T</span><span class="stack">Databricks · Delta Lake</span></div>
+      <div class="row"><span class="ok">● SHIPPED</span><span class="title">Data Quality &amp; Anomaly Detection Framework</span><span class="org">AT&amp;T</span><span class="stack">Airflow · Python · SQL</span></div>
+      <div class="row"><span class="ok">● SHIPPED</span><span class="title">AWS / Azure Medallion Pipeline Buildout</span><span class="org">Exact Trust</span><span class="stack">AWS · Azure · Databricks</span></div>
+      <div class="row"><span class="ok">● SHIPPED</span><span class="title">SQL Performance Optimization &amp; Reporting</span><span class="org">DbConn</span><span class="stack">SQL Server · T-SQL</span></div>
+      <div class="row"><span class="ok">● SHIPPED</span><span class="title">Oracle Flexcube Upgrade — v6.2 to v14.0</span><span class="org">Skye Bank (SL)</span><span class="stack">Oracle Flexcube</span></div>
     </div>
   </div>
 
-  <!-- bottom gradient fade into white -->
-  <div style="position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,rgba(255,255,255,0.08));pointer-events:none"></div>
+  <details class="more">
+    <summary><span class="closed">$ ./jobs --all &nbsp;# show all 34 projects</span><span class="opened">$ ./jobs --top=6 &nbsp;# hide full list</span></summary>
+    <div class="all-jobs">
+      <div class="group"><h3>fisher_investments (2026 – present)</h3><ul>
+        <li>Data engineering — details coming soon <span>· Python, SQL</span> <span class="live">● ACTIVE</span></li>
+      </ul></div>
+      <div class="group"><h3>att (2025 – 2026)</h3><ul>
+        <li>Telecom Customer Data ETL Modernization <span>· Python, PySpark, Airflow, Spark</span></li>
+        <li>Databricks Delta Lake Performance Optimization <span>· Databricks, Delta Lake, PySpark</span></li>
+        <li>Data Quality &amp; Anomaly Detection Framework <span>· Airflow, Python, SQL</span></li>
+      </ul></div>
+      <div class="group"><h3>exact_trust (2023 – 2024)</h3><ul>
+        <li>AWS / Azure Medallion Data Pipeline Buildout <span>· AWS, Azure, Databricks, Delta Lake</span></li>
+        <li>Vulnerability Analytics &amp; Compliance Dashboard <span>· Rapid7, Power BI, Python</span></li>
+        <li>Sentinel &amp; Tines Security Automation Playbooks <span>· Sentinel, Logic Apps, Tines, SOAR</span></li>
+      </ul></div>
+      <div class="group"><h3>dbconn (2023)</h3><ul>
+        <li>SQL Performance Optimization &amp; Reporting Automation <span>· SQL Server, T-SQL, Crystal Reports</span></li>
+      </ul></div>
+      <div class="group"><h3>skye_bank_sl (2020 – 2022)</h3><ul>
+        <li>B2W-W2B (Bank-2-Wallet) with Africell <span>· USSD, API, Fintech</span></li>
+        <li>Oracle Flexcube Upgrade — v6.2 to v14.0 <span>· Oracle Flexcube, Data Center</span></li>
+        <li>Skye Web — Internet Banking Platform <span>· Internet Banking, REST API, OTP</span></li>
+        <li>Skye Alert — SMS Transaction Notification System <span>· REST API, SOAP, SMS Gateway</span></li>
+        <li>Real-Time Payment Portal — Mercury Limited <span>· Payment Portal, REST API</span></li>
+        <li>ProcessMaker Workflow Implementation <span>· ProcessMaker, Workflow</span></li>
+        <li>NRA ITAS Integration — National Revenue Authority <span>· Government API, Real-Time</span></li>
+        <li>Mastercard Debit Card — Instant Issuance <span>· Mastercard, Core Banking</span></li>
+        <li>Microsoft 365 Email Migration — SL &amp; Guinea <span>· Microsoft 365, Migration</span></li>
+      </ul></div>
+      <div class="group"><h3>uba_sierra_leone (2020)</h3><ul>
+        <li>EDSA Electricity Vending — LEO WhatsApp &amp; Facebook Banking <span>· WhatsApp Banking, Facebook, API</span></li>
+      </ul></div>
+      <div class="group"><h3>gtbank_sierra_leone (2015 – 2019)</h3><ul>
+        <li>USSD Banking (*3737#) Implementation <span>· USSD, REST API, VB.Net</span></li>
+        <li>GTBank Internet Banking &amp; GAPS Platform <span>· Internet Banking, ASP.Net</span> <a href="https://ibank.gtb.sl/ibank6">live</a></li>
+        <li>GT-Simpay Mobile Web Service <span>· Web Services, REST API</span></li>
+        <li>SME Market Hub <span>· Web Portal, PHP, MySQL</span></li>
+        <li>ATM Omni-Channel Enhancement <span>· ATM, Postilion, API</span></li>
+        <li>Mobile Account Opening Solution <span>· Mobile, Android, REST API</span></li>
+        <li>USD Mastercard Debit Card Issuance <span>· Mastercard, USD Card</span></li>
+        <li>e-STR Suspicious Transaction Reporting App <span>· AML, ASP.Net, SQL Server</span></li>
+        <li>US Visa Collection System (GTCollection) <span>· Payment Portal, ASP.Net</span></li>
+        <li>TSA Application — Sierra Leone Government Reporting <span>· Government, TSA, VB.Net</span></li>
+      </ul></div>
+      <div class="group"><h3>unified_payment_services (2015)</h3><ul>
+        <li>POS Super Settler — Merchant Settlement Application <span>· VB.Net, Oracle, POS</span></li>
+      </ul></div>
+      <div class="group"><h3>powersoft (2012 – 2015)</h3><ul>
+        <li>Power HMO — Medexia Limited <span>· VB.Net, SQL Server, HMO</span> <a href="http://www.medexia.com">live</a></li>
+        <li>Revenue Collection System — UDUTH Sokoto <span>· VB.Net, SQL Server</span></li>
+        <li>Power Suite — Hotel Management Solution <span>· VB.Net, SQL Server, ERP</span></li>
+        <li>Power Library — School Library Solution <span>· VB.Net, SQL Server</span></li>
+        <li>Power POS — Multi-Company Implementations <span>· VB.Net, SQL Server, POS</span></li>
+        <li>Sales Force Automation — Procter &amp; Gamble Nigeria <span>· Android, Java, Bluetooth</span></li>
+      </ul></div>
+    </div>
+  </details>
+</section>
+
+<section id="log">
+  <h2>$ git log --career --oneline</h2>
+  <div class="log-row"><span class="log-date">2026 – now</span><span class="log-body"><b>Data Engineer</b> <span>@ Fisher Investments · TX</span></span></div>
+  <div class="log-row"><span class="log-date">2025 – 2026</span><span class="log-body"><b>Data Engineer</b> <span>@ AT&amp;T · USA</span></span></div>
+  <div class="log-row"><span class="log-date">2023 – 2024</span><span class="log-body"><b>Data Engineer / Cloud &amp; Analytics</b> <span>@ Exact Trust · Dallas, TX</span></span></div>
+  <div class="log-row"><span class="log-date">2023</span><span class="log-body"><b>Data Engineer / SQL Developer</b> <span>@ DbConn · Hamburg, DE</span></span></div>
+  <div class="log-row"><span class="log-date">2020 – 2022</span><span class="log-body"><b>Lead, Information Technology</b> <span>@ Skye Bank · Freetown, SL</span></span></div>
+  <div class="log-row"><span class="log-date">2020</span><span class="log-body"><b>Lead, Digital Banking &amp; Sales</b> <span>@ UBA · Freetown, SL</span></span></div>
+  <div class="log-row"><span class="log-date">2015 – 2019</span><span class="log-body"><b>Lead Software Developer</b> <span>@ GTBank · Freetown, SL</span></span></div>
+  <div class="log-row"><span class="log-date">2015</span><span class="log-body"><b>Senior Software Developer</b> <span>@ Unified Payment Services · NG</span></span></div>
+  <div class="log-row"><span class="log-date">2012 – 2015</span><span class="log-body"><b>Software Developer</b> <span>@ Powersoft Integrated Solutions · NG</span></span></div>
+</section>
+
+<section id="stack">
+  <h2>$ cat stack.yml</h2>
+  <div class="yml-grid">
+    <div class="yml"><span class="key">languages:</span><ul><li>Python / PySpark</li><li>SQL · T-SQL · PL/SQL</li><li>Java · C# · PowerShell</li></ul></div>
+    <div class="yml"><span class="key">data_engineering:</span><ul><li>Apache Spark · Databricks</li><li>Airflow · Kafka · dbt</li><li>Delta Lake · ETL/ELT</li></ul></div>
+    <div class="yml"><span class="key">cloud_and_db:</span><ul><li>AWS · Azure · GCP</li><li>Snowflake · Redshift · BigQuery</li><li>Oracle · PostgreSQL</li></ul></div>
+    <div class="yml"><span class="key">security_devops:</span><ul><li>Sentinel · Logic Apps · Tines</li><li>Docker · Kubernetes</li><li>Terraform</li></ul></div>
+  </div>
+  <div class="yml-grid wide">
+    <div class="yml plain"><span class="key">certs:</span><ul><li>AWS Data Engineer – Associate</li><li>AWS Cloud Practitioner</li><li>CompTIA Security+ CE</li></ul></div>
+    <div class="yml plain"><span class="key">education:</span><ul><li>MSc Computer Science, Towson University (2025)</li><li>BSc Computer Science &amp; Mathematics, Fountain University (2011)</li><li>Paper: SARS-CoV-2 detection in CT scans, ViT + GNN — MDPI Algorithms</li></ul></div>
+  </div>
+</section>
+
+<footer id="contact">
+  <p class="cmd">$ ping luke</p>
+  <p class="big">Open to work. Let’s talk data.</p>
+  <div class="links">
+    <a href="mailto:luke.agbetu@gmail.com">luke.agbetu@gmail.com</a>
+    <a href="https://www.linkedin.com/in/lukman-olanrewaju-agbetu-7a49a07b/">linkedin</a>
+    <a href="https://github.com/Lanre2907">github</a>
+  </div>
+  <p class="fine">exit 0 · © 2026 Luke Agbetu · DFW, TX</p>
+</footer>
+
 </div>
-<!-- END HERO -->
-
-<div class="layout" style="margin-top:0">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-label">Navigation</div>
-      <a class="sidebar-item active" href="#overview">
-        <svg class="sidebar-icon" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
-        Overview
-        <span class="sidebar-badge">live</span>
-      </a>
-      <a class="sidebar-item" href="#experience">
-        <svg class="sidebar-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12v1H2zm0 3h12v1H2zm0 3h8v1H2z"/></svg>
-        Experience
-        <span class="sidebar-badge">9</span>
-      </a>
-      <a class="sidebar-item" href="#projects">
-        <svg class="sidebar-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v1H1zm0 4h14v1H1zm0 4h10v1H1z"/></svg>
-        Projects
-        <span class="sidebar-badge">34</span>
-      </a>
-      <a class="sidebar-item" href="#skills">
-        <svg class="sidebar-icon" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 5v3l2 2"/></svg>
-        Skills
-      </a>
-      <a class="sidebar-item" href="#education">
-        <svg class="sidebar-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1L1 5l7 4 7-4-7-4zM1 10l7 4 7-4M1 7l7 4 7-4"/></svg>
-        Education
-      </a>
-      <a class="sidebar-item" href="#contact">
-        <svg class="sidebar-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M13 3H3a1 1 0 00-1 1v8a1 1 0 001 1h10a1 1 0 001-1V4a1 1 0 00-1-1zm-5 5L3 5h10L8 8z"/></svg>
-        Contact
-      </a>
-    </div>
-    <div class="sidebar-divider"></div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Links</div>
-      <a class="sidebar-item" href="https://github.com/Lanre2907" target="_blank">
-        <svg class="sidebar-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        GitHub
-      </a>
-      <a class="sidebar-item" href="https://www.linkedin.com/in/lukman-olanrewaju-agbetu-7a49a07b/" target="_blank">
-        <svg class="sidebar-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 01.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/></svg>
-        LinkedIn
-      </a>
-    </div>
-    <div style="flex:1"></div>
-    <div class="sidebar-avatar">
-      <div class="avatar-img"><img src="data:image/png;base64,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" alt="Luke Agbetu"></div>
-      <div class="avatar-info">
-        <div class="avatar-name">Luke Agbetu</div>
-        <div class="avatar-role">Lead Data Eng.</div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-
-
-
-    <!-- KPI CARDS -->
-    <div class="kpi-grid">
-      <div class="kpi-card g">
-        <div class="kpi-label">Years Experience <span class="kpi-icon">⚡</span></div>
-        <div class="kpi-value">9+</div>
-        <div class="kpi-delta">Across Nigeria · Sierra Leone · Germany · USA</div>
-      </div>
-      <div class="kpi-card b">
-        <div class="kpi-label">Records / Day <span class="kpi-icon">📊</span></div>
-        <div class="kpi-value">10M+</div>
-        <div class="kpi-delta">AT&T telecom data platform</div>
-      </div>
-      <div class="kpi-card p">
-        <div class="kpi-label">Query Perf Gain <span class="kpi-icon">🚀</span></div>
-        <div class="kpi-value">60%</div>
-        <div class="kpi-delta">Advanced SQL optimization · DbConn</div>
-      </div>
-      <div class="kpi-card a">
-        <div class="kpi-label">Cloud Platforms <span class="kpi-icon">☁</span></div>
-        <div class="kpi-value">3</div>
-        <div class="kpi-delta">AWS · Azure · GCP</div>
-      </div>
-    </div>
-
-    <!-- ROW 1: Profile + Experience Timeline -->
-    <div class="panel-grid">
-      <div class="panel" id="experience">
-        <div class="panel-header">
-          <div class="panel-title">Experience</div>
-          <div class="panel-tag">9 roles · 2012–present</div>
-        </div>
-        <div class="panel-body">
-          <table class="timeline-table" width="100%">
-            <tr>
-              <td class="tt-dot"><div class="tt-indicator active"></div></td>
-              <td>
-                <div class="tt-title">Data Engineer</div>
-                <div class="tt-company">Fisher Investments</div>
-                <div><span class="tt-badge live">● Active</span></div>
-              </td>
-              <td class="tt-date">May 2026–Present</td>
-            </tr>
-            <tr>
-              <td class="tt-dot"><div class="tt-indicator done"></div></td>
-              <td>
-                <div class="tt-title">Data Engineer</div>
-                <div class="tt-company">AT&T · Telecom</div>
-                <div><span class="tt-badge done">Completed</span></div>
-              </td>
-              <td class="tt-date">Jan 2025–May 2026</td>
-            </tr>
-            <tr>
-              <td class="tt-dot"><div class="tt-indicator done"></div></td>
-              <td>
-                <div class="tt-title">Data Engineer / Cloud & Analytics</div>
-                <div class="tt-company">Exact Trust · Dallas, TX</div>
-                <div><span class="tt-badge done">Completed</span></div>
-              </td>
-              <td class="tt-date">Oct 2023–Dec 2024</td>
-            </tr>
-            <tr>
-              <td class="tt-dot"><div class="tt-indicator done"></div></td>
-              <td>
-                <div class="tt-title">Data Engineer / SQL Developer</div>
-                <div class="tt-company">DbConn · Hamburg, Germany</div>
-                <div><span class="tt-badge done">Completed</span></div>
-              </td>
-              <td class="tt-date">Mar–Sep 2023</td>
-            </tr>
-            <tr>
-              <td class="tt-dot"><div class="tt-indicator old"></div></td>
-              <td>
-                <div class="tt-title">Lead, Information Technology</div>
-                <div class="tt-company">Skye Bank (SL) · Freetown, Sierra Leone</div>
-                <div><span class="tt-badge prev">Previous</span></div>
-              </td>
-              <td class="tt-date">2020 – 2022</td>
-            </tr>
-            <tr>
-              <td class="tt-dot"><div class="tt-indicator old"></div></td>
-              <td>
-                <div class="tt-title">Lead, Digital Banking &amp; Sales</div>
-                <div class="tt-company">UBA Sierra Leone · Freetown, Sierra Leone</div>
-                <div><span class="tt-badge prev">Previous</span></div>
-              </td>
-              <td class="tt-date">2020</td>
-            </tr>
-            <tr>
-              <td class="tt-dot"><div class="tt-indicator old"></div></td>
-              <td>
-                <div class="tt-title">Lead Software Developer / Technology</div>
-                <div class="tt-company">GTBank Sierra Leone · Freetown, Sierra Leone</div>
-                <div><span class="tt-badge prev">Previous</span></div>
-              </td>
-              <td class="tt-date">2015 – 2019</td>
-            </tr>
-            <tr>
-              <td class="tt-dot"><div class="tt-indicator old"></div></td>
-              <td>
-                <div class="tt-title">Senior Software Developer</div>
-                <div class="tt-company">Unified Payment Services · Nigeria</div>
-                <div><span class="tt-badge prev">Previous</span></div>
-              </td>
-              <td class="tt-date">2015</td>
-            </tr>
-            <tr>
-              <td class="tt-dot"><div class="tt-indicator old"></div></td>
-              <td>
-                <div class="tt-title">Software Developer</div>
-                <div class="tt-company">Powersoft Integrated Solutions · Nigeria</div>
-                <div><span class="tt-badge prev">Previous</span></div>
-              </td>
-              <td class="tt-date">2012 – 2015</td>
-            </tr>
-          </table>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Profile</div>
-          <div class="panel-tag">engineer</div>
-        </div>
-        <div class="panel-body">
-          <div class="profile-row">
-            <div class="profile-photo"><img src="data:image/png;base64,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" alt="Luke Agbetu"></div>
-            <div>
-              <div class="profile-name">Luke Agbetu</div>
-              <div class="profile-role">Lead Data Engineer</div>
-              <div class="profile-loc">📍 Aubrey, TX · DFW Area</div>
-            </div>
-          </div>
-          <div class="profile-fields">
-            <div class="pf-row"><span class="pf-label">Email</span><span class="pf-value">luke.agbetu@gmail.com</span></div>
-            <div class="pf-row"><span class="pf-label">Phone</span><span class="pf-value">(989) 817-5630</span></div>
-            <div class="pf-row"><span class="pf-label">GitHub</span><a class="pf-link" href="https://github.com/Lanre2907" target="_blank">github.com/Lanre2907</a></div>
-            <div class="pf-row"><span class="pf-label">LinkedIn</span><a class="pf-link" href="https://www.linkedin.com/in/lukman-olanrewaju-agbetu-7a49a07b/" target="_blank">lukman-olanrewaju-agbetu</a></div>
-            <div class="pf-row"><span class="pf-label">Portfolio</span><a class="pf-link" href="https://lukeagbetu.com" target="_blank">lukeagbetu.com</a></div>
-            <div class="pf-row"><span class="pf-label">Status</span><span class="pf-value" style="color:var(--green)">● Open to opportunities</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROW 2: Skills -->
-    <div class="panel-grid" id="skills">
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Core Stack — Proficiency</div>
-          <div class="panel-tag">self-assessed</div>
-        </div>
-        <div class="panel-body">
-          <div class="skill-bar-row"><div class="skill-bar-header"><span class="skill-bar-name">Python / PySpark</span><span class="skill-bar-pct">95%</span></div><div class="skill-track"><div class="skill-fill b" style="width:95%"></div></div></div>
-          <div class="skill-bar-row"><div class="skill-bar-header"><span class="skill-bar-name">SQL / T-SQL / PL-SQL</span><span class="skill-bar-pct">95%</span></div><div class="skill-track"><div class="skill-fill g" style="width:95%"></div></div></div>
-          <div class="skill-bar-row"><div class="skill-bar-header"><span class="skill-bar-name">Apache Spark / Databricks</span><span class="skill-bar-pct">90%</span></div><div class="skill-track"><div class="skill-fill b" style="width:90%"></div></div></div>
-          <div class="skill-bar-row"><div class="skill-bar-header"><span class="skill-bar-name">Apache Airflow</span><span class="skill-bar-pct">88%</span></div><div class="skill-track"><div class="skill-fill p" style="width:88%"></div></div></div>
-          <div class="skill-bar-row"><div class="skill-bar-header"><span class="skill-bar-name">AWS / Azure / GCP</span><span class="skill-bar-pct">85%</span></div><div class="skill-track"><div class="skill-fill a" style="width:85%"></div></div></div>
-          <div class="skill-bar-row"><div class="skill-bar-header"><span class="skill-bar-name">Docker / Kubernetes / Terraform</span><span class="skill-bar-pct">80%</span></div><div class="skill-track"><div class="skill-fill c" style="width:80%"></div></div></div>
-          <div class="skill-bar-row"><div class="skill-bar-header"><span class="skill-bar-name">Sentinel / Logic Apps / Tines</span><span class="skill-bar-pct">78%</span></div><div class="skill-track"><div class="skill-fill g" style="width:78%"></div></div></div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Full Tech Stack</div>
-          <div class="panel-tag">by category</div>
-        </div>
-        <div class="panel-body">
-          <div class="stack-section">
-            <div class="stack-label">Languages</div>
-            <div class="stack-pills">
-              <span class="spill hi">Python</span><span class="spill hi">SQL</span><span class="spill hi">PySpark</span>
-              <span class="spill">Spark SQL</span><span class="spill">PL/SQL</span><span class="spill">PowerShell</span>
-              <span class="spill">Java</span><span class="spill">Node.js</span><span class="spill">C#</span>
-            </div>
-          </div>
-          <div class="stack-section">
-            <div class="stack-label">Data Engineering</div>
-            <div class="stack-pills">
-              <span class="spill hi">Apache Spark</span><span class="spill hi">Airflow</span><span class="spill hi">Databricks</span>
-              <span class="spill">Delta Lake</span><span class="spill">Kafka</span><span class="spill">dbt</span><span class="spill">ETL/ELT</span>
-            </div>
-          </div>
-          <div class="stack-section">
-            <div class="stack-label">Cloud & Databases</div>
-            <div class="stack-pills">
-              <span class="spill g">AWS</span><span class="spill g">Azure</span><span class="spill g">GCP</span>
-              <span class="spill">Snowflake</span><span class="spill">Redshift</span><span class="spill">BigQuery</span>
-              <span class="spill">Oracle</span><span class="spill">PostgreSQL</span>
-            </div>
-          </div>
-          <div class="stack-section">
-            <div class="stack-label">Security & DevOps</div>
-            <div class="stack-pills">
-              <span class="spill p">Sentinel</span><span class="spill p">Logic Apps</span><span class="spill p">Tines</span>
-              <span class="spill">Docker</span><span class="spill">Kubernetes</span><span class="spill">Terraform</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROW 3: Projects Table -->
-    <div class="panel" id="projects" style="margin-bottom:1rem">
-      <div class="panel-header">
-        <div class="panel-title">Projects</div>
-        <div class="panel-tag">34 shipped</div>
-      </div>
-      <div class="panel-body">
-
-        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 0.5rem;display:flex;align-items:center;gap:0.75rem"><span style="color:var(--ink);font-weight:600">Fisher Investments</span><span style="flex:1;height:1px;background:var(--border)"></span><span>2026 – Present</span></div>
-        <table class="proj-table" style="margin-bottom:1.25rem"><thead><tr><th>Project</th><th>Status</th><th>Stack</th><th>Link</th></tr></thead><tbody>
-          <tr><td><div class="proj-name">Data Engineering — Details Coming Soon</div></td><td><span class="proj-status live">Active</span></td><td><div class="proj-tech"><span class="proj-tag">Python</span><span class="proj-tag">SQL</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-        </tbody></table>
-
-        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 0.5rem;display:flex;align-items:center;gap:0.75rem"><span style="color:var(--ink);font-weight:600">AT&amp;T</span><span style="flex:1;height:1px;background:var(--border)"></span><span>2025 – 2026</span></div>
-        <table class="proj-table" style="margin-bottom:1.25rem"><thead><tr><th>Project</th><th>Status</th><th>Stack</th><th>Link</th></tr></thead><tbody>
-          <tr><td><div class="proj-name">Telecom Customer Data ETL Modernization</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Python</span><span class="proj-tag">PySpark</span><span class="proj-tag">Airflow</span><span class="proj-tag">Spark</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Databricks Delta Lake Performance Optimization</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Databricks</span><span class="proj-tag">Delta Lake</span><span class="proj-tag">PySpark</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Data Quality &amp; Anomaly Detection Framework</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Airflow</span><span class="proj-tag">Python</span><span class="proj-tag">SQL</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-        </tbody></table>
-
-        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 0.5rem;display:flex;align-items:center;gap:0.75rem"><span style="color:var(--ink);font-weight:600">Exact Trust</span><span style="flex:1;height:1px;background:var(--border)"></span><span>2023 – 2024</span></div>
-        <table class="proj-table" style="margin-bottom:1.25rem"><thead><tr><th>Project</th><th>Status</th><th>Stack</th><th>Link</th></tr></thead><tbody>
-          <tr><td><div class="proj-name">AWS / Azure Medallion Data Pipeline Buildout</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">AWS</span><span class="proj-tag">Azure</span><span class="proj-tag">Databricks</span><span class="proj-tag">Delta Lake</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Vulnerability Analytics &amp; Compliance Dashboard</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Rapid7</span><span class="proj-tag">Power BI</span><span class="proj-tag">Python</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Sentinel &amp; Tines Security Automation Playbooks</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Sentinel</span><span class="proj-tag">Logic Apps</span><span class="proj-tag">Tines</span><span class="proj-tag">SOAR</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-        </tbody></table>
-
-        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 0.5rem;display:flex;align-items:center;gap:0.75rem"><span style="color:var(--ink);font-weight:600">DbConn</span><span style="flex:1;height:1px;background:var(--border)"></span><span>2023</span></div>
-        <table class="proj-table" style="margin-bottom:1.25rem"><thead><tr><th>Project</th><th>Status</th><th>Stack</th><th>Link</th></tr></thead><tbody>
-          <tr><td><div class="proj-name">SQL Performance Optimization &amp; Reporting Automation</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">SQL Server</span><span class="proj-tag">T-SQL</span><span class="proj-tag">Crystal Reports</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-        </tbody></table>
-
-        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 0.5rem;display:flex;align-items:center;gap:0.75rem"><span style="color:var(--ink);font-weight:600">Skye Bank (SL)</span><span style="flex:1;height:1px;background:var(--border)"></span><span>2020 – 2022</span></div>
-        <table class="proj-table" style="margin-bottom:1.25rem"><thead><tr><th>Project</th><th>Status</th><th>Stack</th><th>Link</th></tr></thead><tbody>
-          <tr><td><div class="proj-name">B2W-W2B (Bank-2-Wallet) with Africell</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">USSD</span><span class="proj-tag">API</span><span class="proj-tag">Fintech</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Oracle Flexcube Upgrade — v6.2 to v14.0</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Oracle Flexcube</span><span class="proj-tag">Data Center</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Skye Web — Internet Banking Platform</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Internet Banking</span><span class="proj-tag">REST API</span><span class="proj-tag">OTP</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Skye Alert — SMS Transaction Notification System</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">REST API</span><span class="proj-tag">SOAP</span><span class="proj-tag">SMS Gateway</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Real-Time Payment Portal — Mercury Limited</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Payment Portal</span><span class="proj-tag">REST API</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">ProcessMaker Workflow Implementation</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">ProcessMaker</span><span class="proj-tag">Workflow</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">NRA ITAS Integration — National Revenue Authority</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Government API</span><span class="proj-tag">Real-Time</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Mastercard Debit Card — Instant Issuance</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Mastercard</span><span class="proj-tag">Core Banking</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Microsoft 365 Email Migration — SL &amp; Guinea</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Microsoft 365</span><span class="proj-tag">Migration</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-        </tbody></table>
-
-        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 0.5rem;display:flex;align-items:center;gap:0.75rem"><span style="color:var(--ink);font-weight:600">UBA Sierra Leone</span><span style="flex:1;height:1px;background:var(--border)"></span><span>2020</span></div>
-        <table class="proj-table" style="margin-bottom:1.25rem"><thead><tr><th>Project</th><th>Status</th><th>Stack</th><th>Link</th></tr></thead><tbody>
-          <tr><td><div class="proj-name">EDSA Electricity Vending — LEO WhatsApp &amp; Facebook Banking</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">WhatsApp Banking</span><span class="proj-tag">Facebook</span><span class="proj-tag">API</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-        </tbody></table>
-
-        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 0.5rem;display:flex;align-items:center;gap:0.75rem"><span style="color:var(--ink);font-weight:600">GTBank Sierra Leone</span><span style="flex:1;height:1px;background:var(--border)"></span><span>2015 – 2019</span></div>
-        <table class="proj-table" style="margin-bottom:1.25rem"><thead><tr><th>Project</th><th>Status</th><th>Stack</th><th>Link</th></tr></thead><tbody>
-          <tr><td><div class="proj-name">USSD Banking (*3737#) Implementation</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">USSD</span><span class="proj-tag">REST API</span><span class="proj-tag">VB.Net</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">GTBank Internet Banking &amp; GAPS Platform</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Internet Banking</span><span class="proj-tag">ASP.Net</span></div></td><td><a class="proj-link" href="https://ibank.gtb.sl/ibank6" target="_blank">→ Live</a></td></tr>
-          <tr><td><div class="proj-name">GT-Simpay Mobile Web Service</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Web Services</span><span class="proj-tag">REST API</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">SME Market Hub</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Web Portal</span><span class="proj-tag">PHP</span><span class="proj-tag">MySQL</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">ATM Omni-Channel Enhancement</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">ATM</span><span class="proj-tag">Postilion</span><span class="proj-tag">API</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Mobile Account Opening Solution</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Mobile</span><span class="proj-tag">Android</span><span class="proj-tag">REST API</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">USD Mastercard Debit Card Issuance</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Mastercard</span><span class="proj-tag">USD Card</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">e-STR Suspicious Transaction Reporting App</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">AML</span><span class="proj-tag">ASP.Net</span><span class="proj-tag">SQL Server</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">US Visa Collection System (GTCollection)</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Payment Portal</span><span class="proj-tag">ASP.Net</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">TSA Application — Sierra Leone Government Reporting</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Government</span><span class="proj-tag">TSA</span><span class="proj-tag">VB.Net</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-        </tbody></table>
-
-        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 0.5rem;display:flex;align-items:center;gap:0.75rem"><span style="color:var(--ink);font-weight:600">Unified Payment Services</span><span style="flex:1;height:1px;background:var(--border)"></span><span>2015</span></div>
-        <table class="proj-table" style="margin-bottom:1.25rem"><thead><tr><th>Project</th><th>Status</th><th>Stack</th><th>Link</th></tr></thead><tbody>
-          <tr><td><div class="proj-name">POS Super Settler — Merchant Settlement Application</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">VB.Net</span><span class="proj-tag">Oracle</span><span class="proj-tag">POS</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-        </tbody></table>
-
-        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 0.5rem;display:flex;align-items:center;gap:0.75rem"><span style="color:var(--ink);font-weight:600">Powersoft Integrated Solutions</span><span style="flex:1;height:1px;background:var(--border)"></span><span>2012 – 2015</span></div>
-        <table class="proj-table"><thead><tr><th>Project</th><th>Status</th><th>Stack</th><th>Link</th></tr></thead><tbody>
-          <tr><td><div class="proj-name">Power HMO — Medexia Limited</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">VB.Net</span><span class="proj-tag">SQL Server</span><span class="proj-tag">HMO</span></div></td><td><a class="proj-link" href="http://www.medexia.com" target="_blank">→ Live</a></td></tr>
-          <tr><td><div class="proj-name">Revenue Collection System — UDUTH Sokoto</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">VB.Net</span><span class="proj-tag">SQL Server</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Power Suite — Hotel Management Solution</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">VB.Net</span><span class="proj-tag">SQL Server</span><span class="proj-tag">ERP</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Power Library — School Library Solution</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">VB.Net</span><span class="proj-tag">SQL Server</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Power POS — Multi-Company Implementations</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">VB.Net</span><span class="proj-tag">SQL Server</span><span class="proj-tag">POS</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-          <tr><td><div class="proj-name">Sales Force Automation — Procter &amp; Gamble Nigeria</div></td><td><span class="proj-status shipped">Shipped</span></td><td><div class="proj-tech"><span class="proj-tag">Android</span><span class="proj-tag">Java</span><span class="proj-tag">Bluetooth</span></div></td><td><a class="proj-link" href="https://github.com/Lanre2907" target="_blank">→</a></td></tr>
-        </tbody></table>
-
-      </div>
-    </div>
-
-    <!-- ROW 4: Certs + Education + Publication -->
-    <div class="panel-grid-3" id="education">
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Certifications</div>
-          <div class="panel-tag">3 active</div>
-        </div>
-        <div class="panel-body">
-          <div class="cert-row">
-            <div class="cert-icon">AWS</div>
-            <div><div class="cert-name">Data Engineer – Associate</div><div class="cert-issuer">Amazon Web Services</div></div>
-            <div class="cert-check">✓</div>
-          </div>
-          <div class="cert-row">
-            <div class="cert-icon">AWS</div>
-            <div><div class="cert-name">Cloud Practitioner</div><div class="cert-issuer">Amazon Web Services</div></div>
-            <div class="cert-check">✓</div>
-          </div>
-          <div class="cert-row">
-            <div class="cert-icon">SEC+</div>
-            <div><div class="cert-name">Security+ CE</div><div class="cert-issuer">CompTIA</div></div>
-            <div class="cert-check">✓</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Education</div>
-          <div class="panel-tag">2 degrees</div>
-        </div>
-        <div class="panel-body">
-          <div class="edu-row">
-            <div class="edu-deg">MSc. Computer Science</div>
-            <div class="edu-inst">Towson University, Maryland, USA</div>
-            <div class="edu-year">December 2025</div>
-          </div>
-          <div class="edu-row">
-            <div class="edu-deg">BSc. Computer Science & Mathematics</div>
-            <div class="edu-inst">Fountain University, Nigeria</div>
-            <div class="edu-year">July 2011</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Publication</div>
-          <div class="panel-tag">MDPI Algorithms</div>
-        </div>
-        <div class="panel-body">
-          <div class="pub-card-inner">
-            <div class="pub-type">Research Paper</div>
-            <div class="pub-title-text">Detecting SARS-CoV-2 in CT Scans Using Vision Transformer & GNN</div>
-            <a class="proj-link" href="https://www.mdpi.com/search?q=SARS-CoV-2+CT+Vision+Transformer+GNN+Agbetu" target="_blank">→ Read on MDPI</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CONTACT -->
-    <div class="panel" id="contact">
-      <div class="panel-header">
-        <div class="panel-title">Contact</div>
-        <div class="panel-tag">available for opportunities</div>
-      </div>
-      <div class="panel-body" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-        <div>
-          <div class="contact-row">
-            <div class="contact-icon">✉</div>
-            <div><div class="contact-label">Email</div><div class="contact-val">luke.agbetu@gmail.com</div></div>
-          </div>
-          <div class="contact-row">
-            <div class="contact-icon">📞</div>
-            <div><div class="contact-label">Phone</div><div class="contact-val">(989) 817-5630</div></div>
-          </div>
-          <div class="contact-row">
-            <div class="contact-icon">📍</div>
-            <div><div class="contact-label">Location</div><div class="contact-val">Aubrey, TX 76227 · DFW Area</div></div>
-          </div>
-        </div>
-        <div>
-          <div class="contact-row">
-            <div class="contact-icon">in</div>
-            <div><div class="contact-label">LinkedIn</div><div class="contact-val"><a href="https://www.linkedin.com/in/lukman-olanrewaju-agbetu-7a49a07b/" target="_blank">lukman-olanrewaju-agbetu</a></div></div>
-          </div>
-          <div class="contact-row">
-            <div class="contact-icon">⌥</div>
-            <div><div class="contact-label">GitHub</div><div class="contact-val"><a href="https://github.com/Lanre2907" target="_blank">github.com/Lanre2907</a></div></div>
-          </div>
-          <div class="contact-row">
-            <div class="contact-icon">🌐</div>
-            <div><div class="contact-label">Portfolio</div><div class="contact-val"><a href="https://lukeagbetu.com" target="_blank">lukeagbetu.com</a></div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </main>
-</div>
-
-<!-- FOOTER -->
-<div class="dash-footer">
-  <span>luke_agbetu · lead_data_engineer · DFW, TX</span>
-  <span>Luke Agbetu · 2026</span>
-</div>
-
 </body>
 </html>
