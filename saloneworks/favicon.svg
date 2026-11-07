@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="SaloneWorks mark">
+  <rect x="0.00" y="0.00" width="120.00" height="120.00" rx="28.00" fill="#FF5A36"/>
+  <polyline points="24.00,38.00 41.00,82.00 60.00,50.00 79.00,82.00" fill="none" stroke="#FFFFFF" stroke-width="13.00" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="79.00" y1="82.00" x2="93.38" y2="42.98" stroke="#FFC93C" stroke-width="13.00" stroke-linecap="round"/>
+  <polygon points="99.00,28.00 102.75,46.49 84.02,39.47" fill="#FFC93C" stroke="#FFC93C" stroke-width="3.00" stroke-linejoin="round"/>
+</svg>

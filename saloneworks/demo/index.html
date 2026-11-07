@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SaloneWorks prototype</title>
+<style>
+  :root{
+    --bg:#FFFFFF;--surface:#FFFFFF;--surface-2:#F6F3EA;--text:#1B2A24;--text-2:#4B5A53;--muted:#6F7B74;--line:#E6E1D6;--line-strong:#D3CCBC;
+    --forest:#0F2B22;--coral:#FF5A36;--coral-dark:#D9431F;--gold:#FFC93C;--callout:#FFF3DC;--callout-line:#F3DDB0;--ok:#1E7A4B;--ok-bg:#E9F7EE;
+    --logo-a:#0F2B22;--primary:#0F2B22;--on-primary:#FFFFFF;--head-bg:#FFFFFF;color-scheme:light;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0E1512;--surface:#16201C;--surface-2:#1C2823;--text:#EEF1EB;--text-2:#BBC6BF;--muted:#8F9B95;--line:#27332D;--line-strong:#3A4841;
+      --forest:#0F2B22;--coral:#FF6B4A;--coral-dark:#FF8466;--gold:#FFC93C;--callout:#2B2513;--callout-line:#4B3F1A;--ok:#6FD3A0;--ok-bg:#15301F;
+      --logo-a:#FFFBF3;--primary:#FFFBF3;--on-primary:#0F2B22;--head-bg:#0E1512;color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0E1512;--surface:#16201C;--surface-2:#1C2823;--text:#EEF1EB;--text-2:#BBC6BF;--muted:#8F9B95;--line:#27332D;--line-strong:#3A4841;
+      --forest:#0F2B22;--coral:#FF6B4A;--coral-dark:#FF8466;--gold:#FFC93C;--callout:#2B2513;--callout-line:#4B3F1A;--ok:#6FD3A0;--ok-bg:#15301F;
+      --logo-a:#FFFBF3;--primary:#FFFBF3;--on-primary:#0F2B22;--head-bg:#0E1512;color-scheme:dark;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 120px)}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  body::before{content:"";position:fixed;inset:0 0 auto 0;height:env(safe-area-inset-top,0px);background:var(--head-bg);z-index:70}
+  button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+  button{cursor:pointer}
+  svg.i{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  :focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+
+  /* ---------- header ---------- */
+  .site-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:60;background:var(--head-bg);border-bottom:1px solid var(--line)}
+  .header-inner{max-width:1260px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .logo{display:flex;align-items:center;border:0;background:none;padding:0}
+  .logo svg{height:38px;width:164px;display:block}
+  .lg-a{fill:var(--logo-a)}
+  .searchbar{flex:1 1 440px;max-width:780px;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line-strong);border-radius:999px;background:var(--surface);padding:4px 5px 4px 16px;min-width:0}
+  .searchbar:focus-within{border-color:var(--coral)}
+  .searchbar .i{font-size:17px;color:var(--muted)}
+  .searchbar input{flex:1;min-width:0;border:0;background:transparent;outline:none;padding:8px 2px}
+  .searchbar .sep{width:1px;height:24px;background:var(--line)}
+  .searchbar select{border:0;background:transparent;outline:none;padding:8px 2px;max-width:150px;color:var(--text-2)}
+  .go{width:40px;height:40px;border-radius:50%;border:0;background:var(--coral);color:#fff;display:grid;place-items:center;font-size:18px;flex:none}
+  .go:hover{background:var(--coral-dark)}
+  .searchbar .go .i{color:#fff;font-size:18px}
+  .navpills{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+  .navpill{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:8px 15px;font-weight:600;font-size:14px;white-space:nowrap}
+  .navpill:hover{border-color:var(--text-2)}
+  .navpill.on{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+  .navpill.hot{background:var(--coral);border-color:var(--coral);color:#fff}
+  .navpill.hot:hover{background:var(--coral-dark);border-color:var(--coral-dark)}
+  .navpill .n{background:var(--coral);color:#fff;border-radius:999px;font-size:11px;padding:0 6px;line-height:18px;min-width:18px;text-align:center}
+  body:not([data-view="find"]) .searchbar{display:none}
+  body:not([data-view="find"]) .navpills{flex:1;justify-content:flex-end}
+
+  .wrap{max-width:1260px;margin:0 auto;padding:0 20px}
+  .chiprow{display:flex;gap:8px;overflow-x:auto;padding:12px 20px 4px;max-width:1260px;margin:0 auto;scrollbar-width:none}
+  .chiprow::-webkit-scrollbar{display:none}
+  body:not([data-view="find"]) .chiprow{display:none}
+  .chip{flex:none;border:1.5px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:7px 15px;font-size:14px;font-weight:500;color:var(--text-2)}
+  .chip:hover{border-color:var(--text-2);color:var(--text)}
+  .chip.on{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+
+  /* ---------- callout ---------- */
+  .callout{position:relative;display:flex;align-items:center;gap:22px;background:var(--callout);border:1px solid var(--callout-line);border-radius:18px;padding:20px 24px;margin-top:14px;box-shadow:0 8px 26px rgba(15,43,34,.12)}
+  .callout h2{margin:0 0 6px;font-size:20px;color:var(--text)}
+  .callout p{margin:0 0 14px;max-width:62ch;color:var(--text-2)}
+  .callout .btns{display:flex;gap:10px;flex-wrap:wrap}
+  .callout .art{margin-left:auto;flex:none;width:92px;height:92px}
+  .callout .art svg{width:100%;height:100%;display:block}
+  .x{position:absolute;top:10px;right:12px;border:0;background:none;font-size:22px;line-height:1;color:var(--muted);padding:4px 8px}
+  .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 20px;font-weight:700;font-size:14px;border:1.5px solid var(--primary);background:var(--primary);color:var(--on-primary)}
+  .btn:hover{opacity:.9}
+  .btn.out{background:transparent;color:var(--text);border-color:var(--line-strong)}
+  .btn.coral{background:var(--coral);border-color:var(--coral);color:#fff}
+  .btn.coral:hover{background:var(--coral-dark);border-color:var(--coral-dark);opacity:1}
+
+  /* ---------- count bar ---------- */
+  .countbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:20px 0 14px}
+  .countbar .l{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--text-2)}
+  .countbar b{color:var(--text)}
+  .proto{border:1px dashed var(--line-strong);border-radius:999px;padding:1px 10px;font-size:12px;color:var(--muted)}
+  .sort{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text-2)}
+  .sort select{border:0;background:transparent;font-weight:700;color:var(--text);padding:4px 2px;outline:none}
+
+  /* ---------- cards ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding-bottom:60px}
+  .card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:11px;cursor:pointer;overflow:hidden;transition:box-shadow .15s,border-color .15s}
+  .card:hover{border-color:var(--line-strong);box-shadow:0 10px 28px rgba(15,43,34,.14)}
+  .card .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .card .ttl{font-size:17px;font-weight:700;line-height:1.28;color:var(--text)}
+  .card .when{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);white-space:nowrap;padding-top:3px}
+  .loc{align-self:flex-start;display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:2px 9px;font-size:13px;color:var(--text-2);font-weight:500}
+  .tags{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{display:inline-block;border:1px solid var(--line-strong);border-radius:7px;padding:0 8px;font-size:12.5px;line-height:21px;color:var(--text-2);background:var(--surface)}
+  .tag.ok{border-color:var(--ok);color:var(--ok);background:var(--ok-bg);font-weight:600}
+  .tag.gold{border-color:var(--gold);background:var(--gold);color:#3B2B00;font-weight:700}
+  .tag.new{border-color:var(--coral);color:var(--coral);font-weight:600}
+  .tag.pend{border-style:dashed;color:var(--muted)}
+  .co{display:flex;gap:11px;align-items:flex-start}
+  .co .lg{width:48px;height:48px;border-radius:11px;background:var(--sector,#0F2B22);color:#fff;display:grid;place-items:center;font-weight:800;font-size:19px;flex:none;border:1px solid rgba(255,255,255,.12)}
+  .co .tx{font-size:14px;color:var(--text-2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .co .tx b{color:var(--text)}
+  .dsc{display:flex;gap:9px;font-size:13.5px;color:var(--text-2)}
+  .dsc .i{margin-top:3px;color:var(--muted);font-size:15px}
+  .dsc span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin:2px -16px -16px;padding:10px 16px;font-size:13px;color:var(--muted);font-weight:600}
+  .foot .r{color:var(--text);display:inline-flex;align-items:center;gap:3px}
+  .scrim{position:absolute;inset:0;background:rgba(15,43,34,.62);display:flex;align-items:center;justify-content:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .15s}
+  .card:hover .scrim,.card:focus-within .scrim{opacity:1;pointer-events:auto}
+  @media (hover:none){.scrim{display:none}}
+  .scrim .sb{border:0;border-radius:999px;padding:10px 20px;font-weight:700;font-size:14px;background:#fff;color:#0F2B22}
+  .scrim .sb.c{background:var(--coral);color:#fff}
+  .empty{padding:50px 10px;text-align:center;color:var(--muted);grid-column:1/-1}
+
+  /* ---------- other views ---------- */
+  .view{display:none}.view.on{display:block}
+  .pagehead{padding:30px 0 6px}
+  .pagehead h1{margin:0 0 6px;font-size:30px;line-height:1.15;letter-spacing:-.4px}
+  .pagehead h1 em{font-style:normal;color:var(--coral)}
+  .pagehead p{margin:0;color:var(--text-2);max-width:60ch}
+  .back{border:0;background:none;color:var(--text-2);font-weight:600;padding:0;margin-bottom:6px;display:inline-flex;align-items:center;gap:4px}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;max-width:640px;margin:18px 0 60px}
+  label{display:block;font-size:13px;font-weight:700;color:var(--text-2);margin:16px 0 6px}
+  label:first-child{margin-top:0}
+  .f{width:100%;border:1.5px solid var(--line-strong);background:var(--surface);border-radius:12px;padding:11px 14px;outline:none}
+  .f:focus{border-color:var(--coral)}
+  textarea.f{min-height:96px;resize:vertical}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .two > div > label:first-child{margin-top:16px}
+  .err{color:var(--coral-dark);font-size:12.5px;margin-top:4px;display:none}
+  .ok-box{display:none;margin-top:16px;border:1px solid var(--ok);background:var(--ok-bg);color:var(--ok);border-radius:12px;padding:12px 14px;font-weight:600}
+  .talentbar{margin:18px 0}
+  .talentbar .searchbar{display:flex;max-width:640px}
+  .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding-bottom:60px}
+  .cand .ttl{font-size:17px;font-weight:700}
+  .cand .role{color:var(--text-2);font-size:14px}
+  .applist{max-width:760px;margin:18px 0 60px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
+  .ap{display:flex;justify-content:space-between;gap:14px;padding:14px 18px;border-bottom:1px solid var(--line)}
+  .ap:last-child{border-bottom:0}
+  .ap .s{color:var(--ok);font-weight:700;font-size:13px;white-space:nowrap}
+  .ap small{color:var(--muted)}
+
+  /* ---------- modal + toast ---------- */
+  .ov{position:fixed;inset:0;background:rgba(10,20,16,.6);display:none;align-items:flex-start;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 30px) 14px 30px;overflow-y:auto;z-index:100}
+  .ov.on{display:flex}
+  .modal{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:20px;max-width:560px;width:100%;padding:26px}
+  .modal h2{margin:0 36px 4px 0;font-size:22px;line-height:1.25}
+  .modal .by{color:var(--text-2);margin-bottom:12px}
+  .modal .desc{margin:14px 0;color:var(--text-2);white-space:pre-line}
+  .modal hr{border:0;border-top:1px solid var(--line);margin:18px 0}
+  .modal .x{top:14px;right:14px}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);transform:translate(-50%,20px);background:var(--text);color:var(--bg);border-radius:999px;padding:11px 20px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:all .2s;z-index:120;max-width:92vw}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+
+  footer{border-top:1px solid var(--line);padding:22px 0 30px;color:var(--muted);font-size:13px}
+  footer .wrap{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+  @media (max-width:760px){
+    .header-inner{padding:10px 14px}
+    .searchbar{order:3;flex-basis:100%}
+    .site-header{position:static}
+    .navpills{order:4;flex-basis:100%;margin-left:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+    .navpills::-webkit-scrollbar{display:none}
+    .navpill{padding:7px 12px;font-size:13px;flex:none}
+    body:not([data-view="find"]) .navpills{justify-content:flex-start}
+    .callout{flex-direction:column;align-items:flex-start;padding:18px}
+    .callout .art{display:none}
+    .two{grid-template-columns:1fr}
+    .wrap,.chiprow{padding-left:14px;padding-right:14px}
+    .pagehead h1{font-size:25px}
+  }
+</style>
+</head>
+<body data-view="find">
+
+<header class="site-header">
+  <div class="header-inner">
+    <button class="logo" onclick="setView('find')" aria-label="SaloneWorks home"><svg viewBox="0 0 519 120" aria-hidden="true" focusable="false">
+  <rect x="0.00" y="0.00" width="120.00" height="120.00" rx="28.00" fill="#FF5A36"/>
+  <polyline points="24.00,38.00 41.00,82.00 60.00,50.00 79.00,82.00" fill="none" stroke="#FFFFFF" stroke-width="13.00" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="79.00" y1="82.00" x2="93.38" y2="42.98" stroke="#FFC93C" stroke-width="13.00" stroke-linecap="round"/>
+  <polygon points="99.00,28.00 102.75,46.49 84.02,39.47" fill="#FFC93C" stroke="#FFC93C" stroke-width="3.00" stroke-linejoin="round"/>
+<path d="M137.92 68.624V67.408Q137.92 67.088 138.144 66.864Q138.368 66.64 138.688 66.64H147.584Q147.904 66.64 148.128 66.864Q148.352 67.088 148.352 67.408V68.176Q148.352 70.288 150.464 71.856Q152.576 73.424 156.16 73.424Q158.976 73.424 160.32 72.208Q161.664 70.992 161.664 69.392Q161.664 68.112 160.86399999999998 67.312Q160.064 66.512 158.72 65.968Q157.376 65.424 154.56 64.464Q154.176 64.27199999999999 153.792 64.17599999999999Q153.40800000000002 64.08 153.088 63.952Q148.928 62.608000000000004 145.856 61.040000000000006Q142.784 59.472 140.608 56.688Q138.432 53.903999999999996 138.432 49.808Q138.432 45.839999999999996 140.512 42.864Q142.592 39.888 146.304 38.288Q150.016 36.688 154.688 36.688Q159.61599999999999 36.688 163.552 38.480000000000004Q167.488 40.272 169.728 43.536Q171.96800000000002 46.8 171.96800000000002 51.024V51.92Q171.96800000000002 52.239999999999995 171.74400000000003 52.464Q171.52 52.688 171.2 52.688H162.304Q161.984 52.688 161.76 52.464Q161.536 52.239999999999995 161.536 51.92V51.471999999999994Q161.536 49.232 159.55200000000002 47.504Q157.568 45.775999999999996 154.24 45.775999999999996Q151.744 45.775999999999996 150.336 46.8Q148.928 47.824 148.928 49.68Q148.928 51.088 149.824 52.016000000000005Q150.72 52.944 152.608 53.744Q154.496 54.544 158.4 55.824Q162.88 57.36 165.376 58.512Q167.872 59.664 170.08 62.256Q172.288 64.848 172.288 69.072Q172.288 73.232 170.176 76.24000000000001Q168.064 79.248 164.256 80.88Q160.448 82.512 155.392 82.512Q150.08 82.512 146.144 80.816Q142.208 79.12 140.064 75.952Q137.92 72.78399999999999 137.92 68.624Z M205.51600000000002 59.408V81.232Q205.51600000000002 81.552 205.29200000000003 81.77600000000001Q205.068 82.0 204.74800000000002 82.0H195.66000000000003Q195.34 82.0 195.116 81.77600000000001Q194.89200000000002 81.552 194.89200000000002 81.232V78.992Q194.89200000000002 78.736 194.764 78.70400000000001Q194.63600000000002 78.672 194.508 78.928Q192.07600000000002 82.512 186.18800000000002 82.512Q181.068 82.512 178.02800000000002 80.112Q174.988 77.712 174.988 73.03999999999999Q174.988 68.112 178.412 65.424Q181.836 62.736000000000004 188.364 62.736000000000004H194.572Q194.89200000000002 62.736000000000004 194.89200000000002 62.416V61.2Q194.89200000000002 59.472 193.74 58.480000000000004Q192.58800000000002 57.488 190.54000000000002 57.488Q189.00400000000002 57.488 187.88400000000001 58.064Q186.764 58.64 186.44400000000002 59.536Q186.12400000000002 60.239999999999995 185.548 60.176L176.33200000000002 58.96Q175.56400000000002 58.832 175.56400000000002 58.384Q175.82000000000002 55.568 177.77200000000002 53.296Q179.72400000000002 51.024 183.02 49.712Q186.316 48.4 190.348 48.4Q194.63600000000002 48.4 198.092 49.84Q201.548 51.28 203.532 53.808Q205.51600000000002 56.336 205.51600000000002 59.408ZM194.89200000000002 70.352V68.816Q194.89200000000002 68.496 194.572 68.496H190.73200000000003Q188.3 68.496 186.988 69.328Q185.67600000000002 70.16 185.67600000000002 71.824Q185.67600000000002 73.232 186.63600000000002 74.064Q187.596 74.896 189.324 74.896Q191.75600000000003 74.896 193.324 73.648Q194.89200000000002 72.4 194.89200000000002 70.352Z M210.264 81.232V37.967999999999996Q210.264 37.647999999999996 210.488 37.42399999999999Q210.71200000000002 37.199999999999996 211.032 37.199999999999996H220.12000000000003Q220.44000000000003 37.199999999999996 220.66400000000004 37.42399999999999Q220.88800000000003 37.647999999999996 220.88800000000003 37.967999999999996V81.232Q220.88800000000003 81.552 220.66400000000004 81.77600000000001Q220.44000000000003 82.0 220.12000000000003 82.0H211.032Q210.71200000000002 82.0 210.488 81.77600000000001Q210.264 81.552 210.264 81.232Z M225.70000000000002 71.12Q224.93200000000002 68.496 224.93200000000002 65.36Q224.93200000000002 61.84 225.76400000000004 59.152Q227.23600000000002 54.096000000000004 231.23600000000002 51.248000000000005Q235.23600000000002 48.4 240.93200000000002 48.4Q246.56400000000002 48.4 250.46800000000002 51.248000000000005Q254.372 54.096000000000004 255.90800000000002 59.088Q256.80400000000003 61.968 256.80400000000003 65.232Q256.80400000000003 68.176 256.1 70.864Q254.75600000000003 76.24 250.72400000000005 79.376Q246.69200000000004 82.512 240.86800000000002 82.512Q235.10800000000003 82.512 231.07600000000002 79.44Q227.04400000000004 76.368 225.70000000000002 71.12ZM245.73200000000003 69.008Q246.11600000000004 67.344 246.11600000000004 65.36Q246.11600000000004 63.44 245.66800000000003 61.647999999999996Q245.15600000000003 59.664 243.94000000000003 58.576Q242.72400000000002 57.488 240.86800000000002 57.488Q237.15600000000003 57.488 236.00400000000002 61.647999999999996Q235.62000000000003 63.184 235.62000000000003 65.36Q235.62000000000003 67.344 236.00400000000002 69.008Q236.51600000000002 71.056 237.764 72.24000000000001Q239.01200000000003 73.424 240.86800000000002 73.424Q242.72400000000002 73.424 243.94000000000003 72.24000000000001Q245.15600000000003 71.056 245.73200000000003 69.008Z M290.92800000000005 60.176V81.232Q290.92800000000005 81.552 290.70400000000006 81.77600000000001Q290.48 82.0 290.16 82.0H281.07200000000006Q280.75200000000007 82.0 280.528 81.77600000000001Q280.30400000000003 81.552 280.30400000000003 81.232V62.480000000000004Q280.30400000000003 60.304 279.0880000000001 58.896Q277.87200000000007 57.488 275.95200000000006 57.488Q273.9680000000001 57.488 272.75200000000007 58.864Q271.53600000000006 60.239999999999995 271.53600000000006 62.480000000000004V81.232Q271.53600000000006 81.552 271.312 81.77600000000001Q271.088 82.0 270.76800000000003 82.0H261.68000000000006Q261.36000000000007 82.0 261.1360000000001 81.77600000000001Q260.91200000000003 81.552 260.91200000000003 81.232V49.68Q260.91200000000003 49.36 261.1360000000001 49.135999999999996Q261.36000000000007 48.912 261.68000000000006 48.912H270.76800000000003Q271.088 48.912 271.312 49.135999999999996Q271.53600000000006 49.36 271.53600000000006 49.68V52.048Q271.53600000000006 52.304 271.63200000000006 52.336Q271.72800000000007 52.367999999999995 271.85600000000005 52.176Q274.28800000000007 48.4 279.53600000000006 48.4Q284.528 48.4 287.72800000000007 51.568Q290.92800000000005 54.736000000000004 290.92800000000005 60.176Z M326.46000000000004 67.6Q326.396 68.368 325.62800000000004 68.368H306.10800000000006Q305.98 68.368 305.85200000000003 68.464Q305.72400000000005 68.56 305.788 68.688Q305.91600000000005 69.392 306.42800000000005 70.544Q307.196 71.888 308.732 72.72Q310.26800000000003 73.55199999999999 312.50800000000004 73.55199999999999Q316.54 73.55199999999999 318.84400000000005 70.928Q319.1 70.608 319.42 70.608Q319.74 70.608 319.932 70.864L324.86 76.496Q325.11600000000004 76.688 325.11600000000004 77.008Q325.11600000000004 77.264 324.86 77.52Q322.62000000000006 79.952 319.32400000000007 81.232Q316.028 82.512 312.124 82.512Q306.3 82.512 302.236 79.98400000000001Q298.172 77.456 296.38000000000005 72.912Q295.03600000000006 69.712 295.03600000000006 64.912Q295.03600000000006 61.584 296.06000000000006 58.512Q297.72400000000005 53.775999999999996 301.53200000000004 51.056Q305.34000000000003 48.336 310.588 48.336Q314.812 48.336 318.14 50.16Q321.468 51.983999999999995 323.548 55.215999999999994Q325.62800000000004 58.448 326.26800000000003 62.544Q326.588 64.464 326.46000000000004 67.6ZM306.172 60.623999999999995Q305.91600000000005 61.328 305.85200000000003 61.968Q305.72400000000005 62.288 306.10800000000006 62.288H315.196Q315.45200000000006 62.288 315.45200000000006 62.032Q315.45200000000006 61.519999999999996 315.196 60.751999999999995Q314.74800000000005 59.152 313.5640000000001 58.32Q312.38000000000005 57.488 310.588 57.488Q307.26000000000005 57.488 306.172 60.623999999999995Z" class="lg-a"/><path d="M341.0 81.36 329.096 38.032 329.03200000000004 37.775999999999996Q329.03200000000004 37.199999999999996 329.73600000000005 37.199999999999996H339.464Q340.10400000000004 37.199999999999996 340.29600000000005 37.839999999999996L345.86400000000003 61.135999999999996Q345.928 61.391999999999996 346.05600000000004 61.391999999999996Q346.184 61.391999999999996 346.24800000000005 61.135999999999996L351.24 37.903999999999996Q351.36800000000005 37.199999999999996 352.072 37.199999999999996H360.968Q361.608 37.199999999999996 361.8 37.839999999999996L367.36800000000005 61.135999999999996Q367.432 61.391999999999996 367.56000000000006 61.391999999999996Q367.68800000000005 61.391999999999996 367.752 61.135999999999996L372.93600000000004 37.903999999999996Q373.064 37.199999999999996 373.76800000000003 37.199999999999996H383.24Q384.136 37.199999999999996 383.944 38.032L373.12800000000004 81.36Q372.93600000000004 82.0 372.232 82.0H363.08000000000004Q362.37600000000003 82.0 362.24800000000005 81.296L356.68 56.592Q356.61600000000004 56.336 356.48800000000006 56.336Q356.36 56.336 356.29600000000005 56.592L351.30400000000003 81.296Q351.17600000000004 82.0 350.47200000000004 82.0H341.896Q341.192 82.0 341.0 81.36Z M387.54 71.12Q386.77200000000005 68.496 386.77200000000005 65.36Q386.77200000000005 61.84 387.60400000000004 59.152Q389.076 54.096000000000004 393.076 51.248000000000005Q397.076 48.4 402.77200000000005 48.4Q408.40400000000005 48.4 412.30800000000005 51.248000000000005Q416.21200000000005 54.096000000000004 417.74800000000005 59.088Q418.644 61.968 418.644 65.232Q418.644 68.176 417.94000000000005 70.864Q416.596 76.24 412.564 79.376Q408.53200000000004 82.512 402.708 82.512Q396.94800000000004 82.512 392.91600000000005 79.44Q388.884 76.368 387.54 71.12ZM407.572 69.008Q407.956 67.344 407.956 65.36Q407.956 63.44 407.50800000000004 61.647999999999996Q406.99600000000004 59.664 405.78000000000003 58.576Q404.564 57.488 402.708 57.488Q398.99600000000004 57.488 397.84400000000005 61.647999999999996Q397.46000000000004 63.184 397.46000000000004 65.36Q397.46000000000004 67.344 397.84400000000005 69.008Q398.35600000000005 71.056 399.60400000000004 72.24000000000001Q400.85200000000003 73.424 402.708 73.424Q404.564 73.424 405.78000000000003 72.24000000000001Q406.99600000000004 71.056 407.572 69.008Z M443.93600000000004 49.296Q444.44800000000004 49.616 444.32000000000005 50.256L442.848 59.152Q442.784 59.92 441.952 59.599999999999994Q440.8 59.344 439.776 59.344Q438.68800000000005 59.344 438.112 59.472Q436.12800000000004 59.727999999999994 434.75200000000007 61.007999999999996Q433.37600000000003 62.288 433.37600000000003 64.4V81.232Q433.37600000000003 81.552 433.15200000000004 81.77600000000001Q432.928 82.0 432.608 82.0H423.52000000000004Q423.20000000000005 82.0 422.976 81.77600000000001Q422.752 81.552 422.752 81.232V49.68Q422.752 49.36 422.976 49.135999999999996Q423.20000000000005 48.912 423.52000000000004 48.912H432.608Q432.928 48.912 433.15200000000004 49.135999999999996Q433.37600000000003 49.36 433.37600000000003 49.68V51.727999999999994Q433.37600000000003 51.92 433.504 51.984Q433.632 52.048 433.696 51.855999999999995Q436.25600000000003 48.464 440.35200000000003 48.464Q442.656 48.464 443.93600000000004 49.296Z M447.212 81.232V37.967999999999996Q447.212 37.647999999999996 447.43600000000004 37.42399999999999Q447.66 37.199999999999996 447.98 37.199999999999996H457.068Q457.388 37.199999999999996 457.61199999999997 37.42399999999999Q457.836 37.647999999999996 457.836 37.967999999999996V57.872Q457.836 58.064 457.964 58.096000000000004Q458.092 58.128 458.22 58.0L465.196 49.36Q465.58 48.912 466.156 48.912H476.588Q477.228 48.912 477.228 49.36Q477.228 49.552 477.036 49.872L468.652 60.688Q468.524 60.879999999999995 468.652 61.135999999999996L478.188 81.104Q478.31600000000003 81.36 478.31600000000003 81.488Q478.31600000000003 82.0 477.612 82.0H468.14Q467.5 82.0 467.244 81.424L461.42 67.792Q461.356 67.664 461.196 67.632Q461.036 67.6 460.972 67.728L457.964 72.016Q457.836 72.272 457.836 72.4V81.232Q457.836 81.552 457.61199999999997 81.77600000000001Q457.388 82.0 457.068 82.0H447.98Q447.66 82.0 447.43600000000004 81.77600000000001Q447.212 81.552 447.212 81.232Z M480.69599999999997 72.528V71.824Q480.69599999999997 71.504 480.91999999999996 71.28Q481.144 71.056 481.464 71.056H490.104Q490.424 71.056 490.648 71.28Q490.872 71.504 490.872 71.824Q490.872 73.03999999999999 492.216 73.84Q493.56 74.64 495.608 74.64Q497.4 74.64 498.456 74.03200000000001Q499.512 73.424 499.512 72.4Q499.512 71.376 498.392 70.896Q497.272 70.416 494.776 69.968Q490.74399999999997 69.2 488.248 68.112Q484.984 66.768 483.06399999999996 64.75200000000001Q481.144 62.736000000000004 481.144 59.216Q481.144 54.224000000000004 485.01599999999996 51.312Q488.888 48.4 495.224 48.4Q499.512 48.4 502.744 49.775999999999996Q505.976 51.152 507.76800000000003 53.647999999999996Q509.56 56.144 509.56 59.408Q509.56 59.727999999999994 509.336 59.952Q509.112 60.176 508.792 60.176H500.408Q500.088 60.176 499.86400000000003 59.952Q499.64 59.727999999999994 499.64 59.408Q499.64 58.192 498.488 57.424Q497.336 56.656 495.352 56.656Q493.56 56.656 492.44 57.263999999999996Q491.32 57.872 491.32 58.96Q491.32 60.048 492.536 60.528Q493.752 61.007999999999996 496.632 61.584Q500.344 62.352000000000004 501.816 62.8Q505.784 64.08 507.99199999999996 66.256Q510.2 68.432 510.2 72.08Q510.2 77.072 506.264 79.792Q502.328 82.512 495.672 82.512Q491.128 82.512 487.736 81.26400000000001Q484.344 80.016 482.52 77.744Q480.69599999999997 75.472 480.69599999999997 72.528Z" fill="#FF5A36"/></svg></button>
+
+    <div class="searchbar" id="searchbar" role="search">
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="text" placeholder="Job title or keyword" aria-label="Search jobs" oninput="renderJobs()">
+      <span class="sep"></span>
+      <select id="loc" aria-label="Location" onchange="renderJobs()">
+        <option value="">All locations</option><option>Freetown</option><option>Bo</option><option>Kenema</option><option>Makeni</option>
+      </select>
+      <button class="go" onclick="renderJobs()" aria-label="Search"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+    </div>
+
+    <nav class="navpills" aria-label="Main">
+      <button class="navpill" data-v="post" onclick="setView('post')"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Post a job</button>
+      <button class="navpill" data-v="talent" onclick="setView('talent')">Search talent</button>
+      <button class="navpill" data-v="apps" onclick="setView('apps')">My applications <span class="n" id="app-n">0</span></button>
+    </nav>
+  </div>
+</header>
+
+<div class="chiprow" id="chips" aria-label="Sectors"></div>
+
+<main class="wrap">
+
+  <!-- ================= FIND ================= -->
+  <section class="view on" id="v-find">
+    <div class="callout" id="callout">
+      <div>
+        <h2>How is SaloneWorks different?</h2>
+        <p>A trusted home for jobs in Sierra Leone. Every listing is reviewed before it goes live, and search is built for how people here actually look for work: by sector, location and salary.</p>
+        <div class="btns">
+          <button class="btn" onclick="setView('post')">Post a job</button>
+          <button class="btn out" onclick="setView('talent')">Search talent</button>
+        </div>
+      </div>
+      <div class="art" aria-hidden="true"><svg viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+  <rect x="0.00" y="0.00" width="120.00" height="120.00" rx="28.00" fill="#FF5A36"/>
+  <polyline points="24.00,38.00 41.00,82.00 60.00,50.00 79.00,82.00" fill="none" stroke="#FFFFFF" stroke-width="13.00" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="79.00" y1="82.00" x2="93.38" y2="42.98" stroke="#FFC93C" stroke-width="13.00" stroke-linecap="round"/>
+  <polygon points="99.00,28.00 102.75,46.49 84.02,39.47" fill="#FFC93C" stroke="#FFC93C" stroke-width="3.00" stroke-linejoin="round"/>
+</svg></div>
+      <button class="x" onclick="document.getElementById('callout').style.display='none'" aria-label="Dismiss">&times;</button>
+    </div>
+
+    <div class="countbar">
+      <div class="l"><span><b id="n-jobs">0</b> jobs</span><span>&middot;</span><span><b id="n-emp">0</b> employers</span><span>&middot;</span><span>Latest jobs, Sierra Leone</span><span class="proto">Prototype: sample listings</span></div>
+      <label class="sort" style="margin:0">Sort by:
+        <select id="sort" onchange="renderJobs()" aria-label="Sort jobs">
+          <option value="feat">Featured first</option><option value="high">Salary: high to low</option><option value="low">Salary: low to high</option>
+        </select>
+      </label>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- ================= POST ================= -->
+  <section class="view" id="v-post">
+    <div class="pagehead">
+      <button class="back" onclick="setView('find')">&larr; Back to jobs</button>
+      <h1>Post a role, reach <em>real candidates</em>.</h1>
+      <p>Free to post. Every listing is reviewed before it goes live, which is what keeps job seekers trusting this board.</p>
+    </div>
+    <div class="panel">
+      <label for="pj-title">Job title</label>
+      <input class="f" id="pj-title" placeholder="e.g. Branch Operations Officer">
+      <div class="err" id="e-title">Enter a job title.</div>
+      <label for="pj-company">Company name</label>
+      <input class="f" id="pj-company" placeholder="e.g. Rokel Commercial Bank">
+      <div class="err" id="e-company">Enter a company name.</div>
+      <div class="two">
+        <div><label for="pj-sector">Sector</label>
+          <select class="f" id="pj-sector"><option>Banking</option><option>Telecom</option><option>NGO</option><option>Health</option><option>Hospitality</option><option>Education</option><option>Mining</option><option>Tech</option></select></div>
+        <div><label for="pj-loc">Location</label>
+          <select class="f" id="pj-loc"><option>Freetown</option><option>Bo</option><option>Kenema</option><option>Makeni</option></select></div>
+      </div>
+      <label>Salary range (SLE per month, optional)</label>
+      <div class="two"><input class="f" id="pj-min" inputmode="numeric" placeholder="Min, e.g. 6000" aria-label="Minimum salary"><input class="f" id="pj-max" inputmode="numeric" placeholder="Max, e.g. 9000" aria-label="Maximum salary"></div>
+      <label for="pj-desc">Job description</label>
+      <textarea class="f" id="pj-desc" placeholder="Responsibilities, requirements, how to apply"></textarea>
+      <div class="err" id="e-desc">Add a short description.</div>
+      <div style="margin-top:20px"><button class="btn coral" onclick="submitJob()">Submit for review</button></div>
+      <div class="ok-box" id="pj-ok">Thanks. Your posting is in the review queue and will appear in search once approved. Until then it shows as &ldquo;Pending review&rdquo; in the job list.</div>
+    </div>
+  </section>
+
+  <!-- ================= TALENT ================= -->
+  <section class="view" id="v-talent">
+    <div class="pagehead">
+      <button class="back" onclick="setView('find')">&larr; Back to jobs</button>
+      <h1>Search <em>candidates</em> directly.</h1>
+      <p>Browse people who have chosen to be discoverable. Full contact details unlock on a paid plan; this is a preview of how employer-side search works.</p>
+    </div>
+    <div class="talentbar">
+      <div class="searchbar" style="display:flex">
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="tq" type="text" placeholder="Skill, role or sector" aria-label="Search candidates" oninput="renderTalent()">
+        <span class="sep"></span>
+        <select id="tloc" aria-label="Candidate location" onchange="renderTalent()"><option value="">All locations</option><option>Freetown</option><option>Bo</option><option>Kenema</option><option>Makeni</option></select>
+        <button class="go" onclick="renderTalent()" aria-label="Search"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+      </div>
+    </div>
+    <div class="countbar" style="margin-top:0"><div class="l"><span><b id="n-cand">0</b> candidates</span><span class="proto">Prototype: sample profiles</span></div></div>
+    <div class="cgrid" id="cgrid"></div>
+  </section>
+
+  <!-- ================= APPLICATIONS ================= -->
+  <section class="view" id="v-apps">
+    <div class="pagehead">
+      <button class="back" onclick="setView('find')">&larr; Back to jobs</button>
+      <h1>Your <em>applications</em>.</h1>
+      <p>Saved on this device only, for this demo.</p>
+    </div>
+    <div id="apps"></div>
+  </section>
+
+</main>
+
+<footer><div class="wrap"><span><a href="../" style="color:inherit">&larr; SaloneWorks story</a> &middot; <a href="../../" style="color:inherit">portfolio</a> &middot; an early-stage prototype for Sierra Leone&rsquo;s job market.</span><span>Sample listings and employer names are for demonstration only.</span></div></footer>
+
+<div class="ov" id="ov"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var SECT_COLOR = {Banking:'#0F2B22',Telecom:'#E8491F',NGO:'#8A5F17',Health:'#B5303A',Hospitality:'#1E6B55',Education:'#5B3FA0',Mining:'#6B5A2E',Tech:'#1F5FA8'};
+  var SECTORS = ['Banking','Telecom','NGO','Health','Hospitality','Education','Mining','Tech'];
+
+  var JOBS = [
+    {id:'j1',title:'Branch Operations Officer',company:'Rokel Commercial Bank',sector:'Banking',location:'Freetown',min:6000,max:8500,featured:true,isNew:false,when:'2h',desc:'Manage daily branch cashflow reconciliation, supervise tellers, and ensure compliance with Bank of Sierra Leone regulations. Requires a degree in finance or accounting and 2+ years of banking experience.'},
+    {id:'j2',title:'Field Monitoring & Evaluation Officer',company:'Concern Worldwide',sector:'NGO',location:'Kenema',min:5500,max:7000,featured:false,isNew:true,when:'3h',desc:'Support data collection and reporting for a nutrition programme across Kenema district. Frequent travel to chiefdoms required. Degree in social sciences or public health preferred.'},
+    {id:'j3',title:'Network Operations Engineer',company:'Orange Sierra Leone',sector:'Telecom',location:'Freetown',min:9000,max:13000,featured:true,isNew:false,when:'5h',desc:'Monitor and maintain core network infrastructure, respond to outages, and support capacity planning across the national network. CCNA or equivalent required.'},
+    {id:'j4',title:'Front Office Supervisor',company:'Radisson Blu Mammy Yoko',sector:'Hospitality',location:'Freetown',min:4500,max:6000,featured:false,isNew:false,when:'1d',desc:'Lead the front desk team, handle guest escalations, and coordinate with housekeeping and reservations. Minimum 3 years of hotel front-office experience.'},
+    {id:'j5',title:'Community Health Nurse',company:'Ministry of Health & Sanitation',sector:'Health',location:'Makeni',min:4000,max:5200,featured:false,isNew:true,when:'1h',desc:'Provide primary care services at a district health centre, run outreach immunisation clinics, and maintain patient records. SRN or SECHN qualification required.'},
+    {id:'j6',title:'Mine Safety Officer',company:'Sierra Rutile Limited',sector:'Mining',location:'Bo',min:8000,max:11000,featured:false,isNew:false,when:'2d',desc:'Enforce site safety protocols across mining operations, run safety inductions, and investigate incidents. HSE certification and 3+ years of mining or industrial experience needed.'},
+    {id:'j7',title:'Backend Developer (Node.js)',company:'Splash Mobile Money',sector:'Tech',location:'Freetown',min:7000,max:10500,featured:true,isNew:true,when:'4h',desc:'Build and maintain APIs powering mobile money transactions. Experience with Node.js, PostgreSQL and payment systems is a strong plus.'},
+    {id:'j8',title:'Secondary School Mathematics Teacher',company:'Prince of Wales School',sector:'Education',location:'Freetown',min:3500,max:4800,featured:false,isNew:false,when:'3d',desc:'Teach mathematics to forms 3 to 5, prepare students for WASSCE, and contribute to extracurricular activities. Teaching qualification required.'},
+    {id:'j9',title:'Grants & Compliance Officer',company:'World Vision Sierra Leone',sector:'NGO',location:'Freetown',min:6500,max:9000,featured:false,isNew:false,when:'2d',desc:'Ensure donor compliance across active grants, support audit preparation, and train field staff on financial procedures. Accounting background preferred.'}
+  ];
+  var PEOPLE = [
+    {id:'c1',name:'Aminata K.',role:'Accountant, 4 yrs experience',sector:'Banking',location:'Freetown',skills:['Accounting','Excel','Reconciliation','Audit'],bio:'Chartered accountancy trainee with four years in commercial banking, currently completing ACCA. Looking for a finance or internal audit role in Freetown.'},
+    {id:'c2',name:'Mohamed S.',role:'M&E Officer, 3 yrs experience',sector:'NGO',location:'Kenema',skills:['Data collection','KoboToolbox','Reporting','Nutrition programmes'],bio:'Monitoring and evaluation officer with field experience across Kenema and Kailahun districts on nutrition and WASH programmes.'},
+    {id:'c3',name:'Fatmata J.',role:'Network Technician, 5 yrs experience',sector:'Telecom',location:'Freetown',skills:['Network infrastructure','CCNA','Troubleshooting','Fibre'],bio:'Telecom field technician with five years maintaining base stations and fibre links across the Western Area.'},
+    {id:'c4',name:'Ibrahim T.',role:'Hotel Front Office, 6 yrs experience',sector:'Hospitality',location:'Freetown',skills:['Guest relations','Reservations systems','Team leadership'],bio:'Front office professional who has worked at two major Freetown hotels, comfortable managing a team through peak season.'},
+    {id:'c5',name:'Isata B.',role:'Registered Nurse, 7 yrs experience',sector:'Health',location:'Makeni',skills:['Primary care','Immunisation','Patient records','Outreach clinics'],bio:'SRN-qualified nurse with seven years in district health centres, experienced running outreach immunisation campaigns.'},
+    {id:'c6',name:'Joseph M.',role:'Backend Developer, 2 yrs experience',sector:'Tech',location:'Freetown',skills:['Node.js','PostgreSQL','APIs','Git'],bio:'Self-taught backend developer with two years building payment-adjacent APIs, comfortable with Node.js and PostgreSQL.'},
+    {id:'c7',name:'Adama F.',role:'Safety Officer, 5 yrs experience',sector:'Mining',location:'Bo',skills:['HSE','Incident investigation','Site induction'],bio:'HSE-certified safety officer with five years across mining and construction sites in the Southern Province.'}
+  ];
+
+  function ls(k,f){try{var r=window.localStorage.getItem(k);return r?JSON.parse(r):f}catch(e){return f}}
+  function sv(k,v){try{window.localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  var posted = ls('sw2_posted',[]), apps = ls('sw2_apps',[]), saved = ls('sw2_saved',[]);
+  var state = {sector:''};
+
+  function $(id){return document.getElementById(id)}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function all(){return JOBS.concat(posted)}
+  function money(a,b){return (a||b)?('SLE '+a.toLocaleString()+'\u2013'+b.toLocaleString()+'/mo'):'Salary not disclosed'}
+  function toast(m){var t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove('on')},2200)}
+
+  var IC = {
+    pin:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+    clock:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    doc:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>',
+    out:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>',
+    chev:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>'
+  };
+
+  window.setView = function(v){
+    document.body.setAttribute('data-view', v);
+    ['find','post','talent','apps'].forEach(function(n){$('v-'+n).classList.toggle('on', n===v)});
+    [].forEach.call(document.querySelectorAll('.navpill[data-v]'),function(b){b.classList.toggle('on', b.getAttribute('data-v')===v)});
+    if(v==='apps') renderApps();
+    if(v==='talent') renderTalent();
+    window.scrollTo(0,0);
+  };
+
+  function chips(){
+    var row=$('chips'); row.innerHTML='';
+    function mk(label,val){
+      var b=document.createElement('button'); b.className='chip'+(state.sector===val?' on':''); b.textContent=label;
+      b.onclick=function(){state.sector=(state.sector===val?'':val); chips(); renderJobs()}; row.appendChild(b);
+    }
+    mk('All sectors',''); SECTORS.forEach(function(s){mk(s,s)});
+  }
+
+  window.renderJobs = function(){
+    var q=($('q').value||'').toLowerCase(), loc=$('loc').value, sort=$('sort').value;
+    var list=all().filter(function(j){
+      return (!q || (j.title+' '+j.company+' '+j.sector+' '+j.desc).toLowerCase().indexOf(q)>-1)
+          && (!loc || j.location===loc) && (!state.sector || j.sector===state.sector);
+    });
+    if(sort==='high') list.sort(function(a,b){return (b.max||0)-(a.max||0)});
+    else if(sort==='low') list.sort(function(a,b){return (a.min||1e9)-(b.min||1e9)});
+    else list.sort(function(a,b){return (b.featured?1:0)-(a.featured?1:0)});
+    var g=$('grid'); g.innerHTML='';
+    if(!list.length){g.innerHTML='<div class="empty">No jobs match those filters yet. Try a different sector or clear the search.</div>'}
+    list.forEach(function(j){
+      var el=document.createElement('article'); el.className='card'; el.setAttribute('data-id',j.id); el.tabIndex=0; el.setAttribute('role','button'); el.setAttribute('aria-label',j.title+' at '+j.company);
+      el.style.setProperty('--sector', SECT_COLOR[j.sector]||'#0F2B22');
+      var isSaved = saved.indexOf(j.id)>-1;
+      var tags='<span class="tag">Full Time</span><span class="tag">'+esc(j.sector)+'</span>';
+      if(j.max||j.min) tags+='<span class="tag ok">'+esc(money(j.min,j.max))+'</span>';
+      if(j.featured) tags+='<span class="tag gold">Featured</span>';
+      if(j.isNew) tags+='<span class="tag new">New</span>';
+      if(j.pending) tags+='<span class="tag pend">Pending review</span>';
+      var blurb=j.desc.length>78 ? j.desc.slice(0,78)+'\u2026' : j.desc;
+      el.innerHTML =
+        '<div class="scrim"><button class="sb" data-act="save" data-id="'+j.id+'">'+(isSaved?'Saved':'Save')+'</button><button class="sb c" data-act="apply" data-id="'+j.id+'">Apply</button></div>'+
+        '<div class="top"><div class="ttl">'+esc(j.title)+'</div><div class="when">'+IC.clock+esc(j.when||'now')+'</div></div>'+
+        '<div class="loc">'+IC.pin+esc(j.location)+', Sierra Leone</div>'+
+        '<div class="tags">'+tags+'</div>'+
+        '<div class="co"><div class="lg">'+esc(j.company.charAt(0))+'</div><div class="tx"><b>'+esc(j.company)+'</b>: '+esc(blurb)+'</div></div>'+
+        '<div class="dsc">'+IC.doc+'<span>'+esc(j.desc)+'</span></div>'+
+        '<div class="foot"><span>Job Posting '+IC.out+'</span><span class="r">View &amp; apply '+IC.chev+'</span></div>';
+      g.appendChild(el);
+    });
+    var live=all().filter(function(j){return !j.pending}), emp={}; live.forEach(function(j){emp[j.company]=1});
+    $('n-jobs').textContent=list.length; $('n-emp').textContent=Object.keys(emp).length;
+  };
+
+  $('grid').addEventListener('click',function(e){
+    var a=e.target.closest('[data-act]');
+    if(a){
+      e.stopPropagation(); var id=a.getAttribute('data-id'), act=a.getAttribute('data-act');
+      if(act==='save'){var i=saved.indexOf(id); if(i>-1){saved.splice(i,1);toast('Removed from saved')}else{saved.push(id);toast('Saved on this device')} sv('sw2_saved',saved); renderJobs();}
+      if(act==='apply') openJob(id);
+      return;
+    }
+    var c=e.target.closest('.card'); if(c) openJob(c.getAttribute('data-id'));
+  });
+  $('grid').addEventListener('keydown',function(e){
+    if(e.key==='Enter' && e.target.classList && e.target.classList.contains('card')) openJob(e.target.getAttribute('data-id'));
+  });
+
+  window.openJob = function(id){
+    var j=all().filter(function(x){return x.id===id})[0]; if(!j) return;
+    $('modal').innerHTML =
+      '<button class="x" onclick="closeModal()" aria-label="Close">&times;</button>'+
+      '<h2>'+esc(j.title)+'</h2><div class="by">'+esc(j.company)+'</div>'+
+      '<div class="loc">'+IC.pin+esc(j.location)+', Sierra Leone</div>'+
+      '<div class="tags" style="margin-top:10px"><span class="tag">Full Time</span><span class="tag">'+esc(j.sector)+'</span>'+((j.max||j.min)?'<span class="tag ok">'+esc(money(j.min,j.max))+'</span>':'')+'</div>'+
+      '<div class="desc">'+esc(j.desc)+'</div><hr>'+
+      '<label for="ap-name">Your full name</label><input class="f" id="ap-name" autocomplete="name">'+
+      '<div class="err" id="e-ap-name">Enter your name.</div>'+
+      '<label for="ap-phone">Phone number</label><input class="f" id="ap-phone" type="tel" autocomplete="tel" placeholder="e.g. 076 123 456">'+
+      '<div class="err" id="e-ap-phone">Enter a phone number.</div>'+
+      '<label for="ap-note">Short note (optional)</label><textarea class="f" id="ap-note" placeholder="Why you\u2019re a good fit"></textarea>'+
+      '<div style="margin-top:18px"><button class="btn coral" id="ap-go">Apply now</button></div>'+
+      '<div class="ok-box" id="ap-ok">Application sent. You can follow it under \u201cMy applications.\u201d</div>';
+    $('ap-go').onclick=function(){submitApp(j)};
+    $('ov').classList.add('on');
+  };
+  window.closeModal = function(){ $('ov').classList.remove('on') };
+  $('ov').addEventListener('click',function(e){ if(e.target===this) closeModal() });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeModal() });
+
+  function submitApp(j){
+    var n=$('ap-name').value.trim(), p=$('ap-phone').value.trim();
+    $('e-ap-name').style.display=n?'none':'block'; $('e-ap-phone').style.display=p?'none':'block';
+    if(!n||!p) return;
+    apps.push({id:'a'+Date.now(),title:j.title,company:j.company,name:n,phone:p,note:$('ap-note').value.trim(),date:new Date().toLocaleDateString()});
+    sv('sw2_apps',apps); $('app-n').textContent=apps.length; $('ap-ok').style.display='block';
+    setTimeout(function(){closeModal(); toast('Application sent')},800);
+  }
+
+  window.submitJob = function(){
+    var t=$('pj-title').value.trim(), c=$('pj-company').value.trim(), d=$('pj-desc').value.trim();
+    $('e-title').style.display=t?'none':'block'; $('e-company').style.display=c?'none':'block'; $('e-desc').style.display=d?'none':'block';
+    if(!t||!c||!d) return;
+    posted.push({id:'p'+Date.now(),title:t,company:c,sector:$('pj-sector').value,location:$('pj-loc').value,min:parseInt($('pj-min').value,10)||0,max:parseInt($('pj-max').value,10)||0,featured:false,isNew:true,pending:true,when:'now',desc:d});
+    sv('sw2_posted',posted); ['pj-title','pj-company','pj-desc','pj-min','pj-max'].forEach(function(i){$(i).value=''});
+    $('pj-ok').style.display='block'; renderJobs(); toast('Submitted for review');
+  };
+
+  window.renderTalent = function(){
+    var q=($('tq').value||'').toLowerCase(), loc=$('tloc').value;
+    var list=PEOPLE.filter(function(c){ return (!q||(c.role+' '+c.sector+' '+c.skills.join(' ')).toLowerCase().indexOf(q)>-1) && (!loc||c.location===loc) });
+    $('n-cand').textContent=list.length;
+    var g=$('cgrid'); g.innerHTML='';
+    if(!list.length) g.innerHTML='<div class="empty">No candidates match yet.</div>';
+    list.forEach(function(c){
+      var el=document.createElement('article'); el.className='card cand'; el.setAttribute('data-c',c.id);
+      el.innerHTML='<div class="top"><div class="ttl">'+esc(c.name)+'</div></div><div class="role">'+esc(c.role)+'</div>'+
+        '<div class="loc">'+IC.pin+esc(c.location)+', Sierra Leone</div>'+
+        '<div class="tags">'+c.skills.map(function(s){return '<span class="tag">'+esc(s)+'</span>'}).join('')+'</div>'+
+        '<div class="dsc">'+IC.doc+'<span>'+esc(c.bio)+'</span></div>'+
+        '<div class="foot"><span>'+esc(c.sector)+'</span><span class="r">Contact details on paid plan</span></div>';
+      g.appendChild(el);
+    });
+  };
+
+  window.renderApps = function(){
+    var box=$('apps');
+    if(!apps.length){box.innerHTML='<div class="panel" style="margin-top:18px">You haven\u2019t applied to anything yet. Open a job and choose Apply.</div>'; return}
+    box.innerHTML='<div class="applist">'+apps.slice().reverse().map(function(a){
+      return '<div class="ap"><div><b>'+esc(a.title)+'</b><br><small>'+esc(a.company)+' \u00b7 applied '+esc(a.date)+'</small></div><div class="s">Submitted</div></div>'}).join('')+'</div>';
+  };
+
+  chips(); renderJobs(); $('app-n').textContent=apps.length;
+})();
+</script>
+</body>
+</html>
